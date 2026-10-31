@@ -1,0 +1,34 @@
+"""Transport abstraction.
+
+The protocol and capability layers depend only on this interface, so the
+concrete wire technology (MQTT over TLS today) can be swapped or faked in tests.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Awaitable, Callable
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass(frozen=True, slots=True)
+class Message:
+    """A raw message exchanged with the TV."""
+
+    topic: str
+    payload: bytes
+
+
+MessageHandler = Callable[[Message], Awaitable[None]]
+
+
+class Transport(Protocol):
+    """Bidirectional, topic-addressed message channel."""
+
+    async def connect(self) -> None: ...
+
+    async def disconnect(self) -> None: ...
+
+    async def publish(self, message: Message) -> None: ...
+
+    async def subscribe(self, topic: str, handler: MessageHandler) -> None: ...
