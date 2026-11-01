@@ -1,0 +1,11 @@
+{
+  "domain": "hisense_vidaa",
+  "name": "Hisense VIDAA",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/OWNER/hisense-vidaa",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/OWNER/hisense-vidaa/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
