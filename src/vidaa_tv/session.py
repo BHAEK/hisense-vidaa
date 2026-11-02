@@ -4,23 +4,14 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
-from dataclasses import dataclass
-from typing import Any
 
-from vidaa_tv.errors import ConnectionFailedError
+from vidaa_tv.errors import ConnectionFailedError, ProtocolError
 from vidaa_tv.protocol import codec
-from vidaa_tv.protocol.topics import Action, command_topic, mobile_filter
+from vidaa_tv.protocol.reply import Reply
+from vidaa_tv.protocol.topics import Action, Service, command_topic, mobile_filter
 from vidaa_tv.transport.base import Message, Transport
 
 DEFAULT_TIMEOUT = 4.0
-
-
-@dataclass(frozen=True, slots=True)
-class Reply:
-    """A decoded message received from the TV."""
-
-    topic: str
-    payload: Any
 
 
 ReplyMatcher = Callable[[Reply], bool]
@@ -61,30 +52,48 @@ class Session:
         """Be called for every message received, including unsolicited pushes."""
         self._listeners.append(listener)
 
-    async def send(self, action: Action, payload: codec.Payload = None) -> None:
+    async def send(
+        self, action: Action, payload: codec.Payload = None, *, service: Service | None = None
+    ) -> None:
         """Publish a command without waiting for a reply."""
-        message = Message(command_topic(self._client_id, action), codec.encode(payload))
+        topic = command_topic(self._client_id, action, service)
+        message = Message(topic, codec.encode(payload))
         await self._transport.publish(message)
+
+    def watch(self, matcher: ReplyMatcher) -> asyncio.Future[Reply]:
+        """Start waiting for a reply *before* sending the command that triggers it."""
+        future: asyncio.Future[Reply] = asyncio.get_running_loop().create_future()
+        entry = (matcher, future)
+        self._waiters.append(entry)
+        future.add_done_callback(lambda _: self._discard(entry))
+        return future
+
+    async def wait(self, future: asyncio.Future[Reply], what: str = "reply") -> Reply:
+        """Await a future from ``watch`` for at most the session timeout."""
+        try:
+            return await asyncio.wait_for(future, self._timeout)
+        except TimeoutError as exc:
+            raise ConnectionFailedError(f"no {what} within {self._timeout:g}s") from exc
 
     async def request(
         self, action: Action, matcher: ReplyMatcher, payload: codec.Payload = None
     ) -> Reply:
         """Publish a command and return the first reply accepted by ``matcher``."""
         await self.open()
-        future: asyncio.Future[Reply] = asyncio.get_running_loop().create_future()
-        entry = (matcher, future)
-        self._waiters.append(entry)
-        try:
-            await self.send(action, payload)
-            return await asyncio.wait_for(future, self._timeout)
-        except TimeoutError as exc:
-            raise ConnectionFailedError(f"no reply to {action} within {self._timeout:g}s") from exc
-        finally:
-            if entry in self._waiters:
-                self._waiters.remove(entry)
+        future = self.watch(matcher)
+        await self.send(action, payload)
+        return await self.wait(future, f"reply to {action}")
+
+    def _discard(self, entry: tuple[ReplyMatcher, asyncio.Future[Reply]]) -> None:
+        if entry in self._waiters:
+            self._waiters.remove(entry)
 
     async def _on_message(self, message: Message) -> None:
-        reply = Reply(message.topic, codec.decode(message.payload))
+        try:
+            payload: object = codec.decode(message.payload)
+        except ProtocolError:
+            payload = message.payload  # binary or non-JSON data is passed through untouched
+        reply = Reply(message.topic, payload)
         for listener in self._listeners:
             listener(reply)
         for matcher, future in list(self._waiters):

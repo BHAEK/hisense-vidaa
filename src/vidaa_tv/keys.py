@@ -31,12 +31,29 @@ class RemoteKey(StrEnum):
     CHANNEL_UP = "KEY_CHANNELUP"
     CHANNEL_DOWN = "KEY_CHANNELDOWN"
 
-    # Playback (the firmware names rewind "KEY_BACK" and fast-forward "KEY_FORWARDS")
+    # Playback (the vendor app names rewind "KEY_BACKS" and fast-forward "KEY_FORWARDS")
     PLAY = "KEY_PLAY"
     PAUSE = "KEY_PAUSE"
     STOP = "KEY_STOP"
-    REWIND = "KEY_BACK"
+    REWIND = "KEY_BACKS"
     FAST_FORWARD = "KEY_FORWARDS"
+    NEXT = "KEY_NEXT"
+    PREVIOUS = "KEY_PREVIOUS"
+    RECORD = "KEY_RECORD"
+    TIMESHIFT = "KEY_TIMESHIFT"
+
+    # Information and TV functions
+    INFO = "KEY_INFO"
+    EPG = "KEY_EPG"
+    SUBTITLE = "KEY_SUBTITLE"
+    TELETEXT = "KEY_TXT"
+    AUDIO = "KEY_AUDIO"
+    SEARCH = "KEY_SEARCH"
+    ZOOM = "KEY_ZOOM"
+    SOURCES = "KEY_SOURCES"
+    FAVORITES = "KEY_FAVORITESS"
+    SLEEP = "KEY_SLEEPS"
+    LIVE_TV = "KEY_TVS"
 
     # Digits
     DIGIT_0 = "KEY_0"
