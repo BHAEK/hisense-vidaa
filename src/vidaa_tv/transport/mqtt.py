@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import logging
 import ssl
 from collections import defaultdict
 from dataclasses import dataclass
@@ -13,9 +14,10 @@ import aiomqtt
 
 from vidaa_tv.errors import ConnectionFailedError
 from vidaa_tv.protocol.auth import Credentials
-from vidaa_tv.transport.base import Message, MessageHandler
+from vidaa_tv.transport.base import DisconnectHandler, Message, MessageHandler
 
 DEFAULT_PORT = 36669
+_LOGGER = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,7 +29,7 @@ class TlsConfig:
     cipher floors for old firmware.
     """
 
-    cert_file: Path
+    cert_file: Path | None = None
     key_file: Path | None = None
     key_password: str | None = None
     verify_server: bool = False
@@ -36,12 +38,17 @@ class TlsConfig:
     def build_context(self) -> ssl.SSLContext:
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         if self.legacy_compat:
-            context.minimum_version = ssl.TLSVersion.TLSv1
-            context.set_ciphers("DEFAULT:@SECLEVEL=0")
+            # Relax the floors for old firmware; a modern OpenSSL may refuse some of
+            # them, in which case the defaults are kept and negotiation decides.
+            with contextlib.suppress(ValueError, ssl.SSLError):
+                context.minimum_version = ssl.TLSVersion.TLSv1
+            with contextlib.suppress(ssl.SSLError):
+                context.set_ciphers("DEFAULT:@SECLEVEL=0")
         if not self.verify_server:
             context.check_hostname = False
             context.verify_mode = ssl.CERT_NONE
-        context.load_cert_chain(self.cert_file, self.key_file, self.key_password)
+        if self.cert_file is not None:
+            context.load_cert_chain(self.cert_file, self.key_file, self.key_password)
         return context
 
 
@@ -65,6 +72,7 @@ class MqttTransport:
         self._client: aiomqtt.Client | None = None
         self._listener: asyncio.Task[None] | None = None
         self._handlers: dict[str, list[MessageHandler]] = defaultdict(list)
+        self._on_disconnect: DisconnectHandler | None = None
 
     async def connect(self) -> None:
         context = await asyncio.to_thread(self._tls.build_context) if self._tls else None
@@ -98,6 +106,9 @@ class MqttTransport:
             with contextlib.suppress(aiomqtt.MqttError, OSError):
                 await client.__aexit__(None, None, None)
 
+    def set_disconnect_handler(self, handler: DisconnectHandler | None) -> None:
+        self._on_disconnect = handler
+
     async def publish(self, message: Message) -> None:
         client = self._require_client()
         try:
@@ -127,4 +138,10 @@ class MqttTransport:
                 for topic_filter, handlers in list(self._handlers.items()):
                     if incoming.topic.matches(topic_filter):
                         for handler in list(handlers):
-                            await handler(message)
+                            try:
+                                await handler(message)
+                            except Exception:  # a faulty handler must not stop the listener
+                                _LOGGER.exception("handler failed for %s", message.topic)
+        # Reaching this point without cancellation means the connection was lost.
+        if self._client is client and self._on_disconnect is not None:
+            self._on_disconnect()

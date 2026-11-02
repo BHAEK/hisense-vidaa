@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from vidaa_tv.transport.base import Message, MessageHandler
+from vidaa_tv.errors import ConnectionFailedError
+from vidaa_tv.transport.base import DisconnectHandler, Message, MessageHandler
 
 
 def _matches(topic_filter: str, topic: str) -> bool:
@@ -17,12 +18,28 @@ class FakeTransport:
     def __init__(self) -> None:
         self.published: list[Message] = []
         self.handlers: dict[str, list[MessageHandler]] = {}
+        self.reachable = True
+        self.connected = False
+        self.connect_calls = 0
+        self._on_disconnect: DisconnectHandler | None = None
 
     async def connect(self) -> None:
-        return None
+        self.connect_calls += 1
+        if not self.reachable:
+            raise ConnectionFailedError("unreachable")
+        self.connected = True
 
     async def disconnect(self) -> None:
-        return None
+        self.connected = False
+
+    def set_disconnect_handler(self, handler: DisconnectHandler | None) -> None:
+        self._on_disconnect = handler
+
+    def drop(self) -> None:
+        """Simulate the TV disappearing."""
+        self.connected = False
+        if self._on_disconnect is not None:
+            self._on_disconnect()
 
     async def publish(self, message: Message) -> None:
         self.published.append(message)

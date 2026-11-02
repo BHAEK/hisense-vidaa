@@ -20,6 +20,7 @@ class Message:
 
 
 MessageHandler = Callable[[Message], Awaitable[None]]
+DisconnectHandler = Callable[[], None]
 
 
 class Transport(Protocol):
@@ -31,6 +32,10 @@ class Transport(Protocol):
 
     async def disconnect(self) -> None:
         """Close the connection. Safe to call when already closed."""
+        ...
+
+    def set_disconnect_handler(self, handler: DisconnectHandler | None) -> None:
+        """Call ``handler`` when an established connection is lost unexpectedly."""
         ...
 
     async def publish(self, message: Message) -> None: ...
