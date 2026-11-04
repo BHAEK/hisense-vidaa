@@ -48,19 +48,16 @@ SENSORS: tuple[VidaaSensorDescription, ...] = (
     VidaaSensorDescription(
         key="source",
         translation_key="source",
-        icon="mdi:video-input-hdmi",
         value_fn=_current_source,
     ),
     VidaaSensorDescription(
         key="channel",
         translation_key="channel",
-        icon="mdi:television-classic",
         value_fn=lambda s: s.state.channel_name if s.state else None,
     ),
     VidaaSensorDescription(
         key="programme",
         translation_key="programme",
-        icon="mdi:television-play",
         value_fn=lambda s: s.state.programme.title if s.state and s.state.programme else None,
     ),
     VidaaSensorDescription(
@@ -72,7 +69,6 @@ SENSORS: tuple[VidaaSensorDescription, ...] = (
     VidaaSensorDescription(
         key="volume",
         translation_key="volume",
-        icon="mdi:volume-high",
         state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda s: s.volume.level if s.volume else None,
     ),

@@ -124,6 +124,28 @@
       "blue": {
         "name": "Blue"
       }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Connection"
+      }
+    }
+  },
+  "exceptions": {
+    "device_off": {
+      "message": "{name} is off, so {func} cannot run."
+    },
+    "communication_error": {
+      "message": "Error communicating with {name} during {func}: {error}"
+    },
+    "turn_on_timeout": {
+      "message": "{name} did not come back on the network after the wake-up request."
+    },
+    "unknown_channel": {
+      "message": "The TV has no channel '{channel}'."
+    },
+    "unsupported_media_type": {
+      "message": "Media type '{media_type}' is not supported."
     }
   }
 }

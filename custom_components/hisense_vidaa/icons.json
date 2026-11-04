@@ -1,0 +1,100 @@
+{
+  "entity": {
+    "sensor": {
+      "source": {
+        "default": "mdi:video-input-hdmi"
+      },
+      "channel": {
+        "default": "mdi:television-classic"
+      },
+      "programme": {
+        "default": "mdi:television-play"
+      },
+      "volume": {
+        "default": "mdi:volume-high"
+      }
+    },
+    "select": {
+      "source": {
+        "default": "mdi:video-input-hdmi"
+      },
+      "app": {
+        "default": "mdi:apps"
+      }
+    },
+    "button": {
+      "home": {
+        "default": "mdi:home"
+      },
+      "menu": {
+        "default": "mdi:menu"
+      },
+      "back": {
+        "default": "mdi:arrow-left"
+      },
+      "exit": {
+        "default": "mdi:exit-to-app"
+      },
+      "epg": {
+        "default": "mdi:television-guide"
+      },
+      "subtitle": {
+        "default": "mdi:subtitles"
+      },
+      "sources": {
+        "default": "mdi:video-input-hdmi"
+      },
+      "mute": {
+        "default": "mdi:volume-mute"
+      },
+      "channel_up": {
+        "default": "mdi:chevron-up"
+      },
+      "channel_down": {
+        "default": "mdi:chevron-down"
+      },
+      "up": {
+        "default": "mdi:arrow-up-bold"
+      },
+      "down": {
+        "default": "mdi:arrow-down-bold"
+      },
+      "left": {
+        "default": "mdi:arrow-left-bold"
+      },
+      "right": {
+        "default": "mdi:arrow-right-bold"
+      },
+      "ok": {
+        "default": "mdi:checkbox-blank-circle-outline"
+      },
+      "play": {
+        "default": "mdi:play"
+      },
+      "pause": {
+        "default": "mdi:pause"
+      },
+      "stop": {
+        "default": "mdi:stop"
+      },
+      "rewind": {
+        "default": "mdi:rewind"
+      },
+      "fast_forward": {
+        "default": "mdi:fast-forward"
+      },
+      "red": {
+        "default": "mdi:circle"
+      },
+      "green": {
+        "default": "mdi:circle"
+      },
+      "yellow": {
+        "default": "mdi:circle"
+      },
+      "blue": {
+        "default": "mdi:circle"
+      }
+    }
+  }
+}

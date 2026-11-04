@@ -1,12 +1,56 @@
-"""Base entity shared by every platform."""
+"""Base entity shared by every platform, and the command error wrapper."""
 
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
+from functools import wraps
+from typing import Concatenate, ParamSpec, TypeVar
+
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
 
+from vidaa_tv import PowerState
+from vidaa_tv.errors import VidaaError
+
 from . import VidaaConfigEntry
 from .const import DOMAIN
+
+_EntityT = TypeVar("_EntityT", bound="VidaaEntity")
+_P = ParamSpec("_P")
+_R = TypeVar("_R")
+
+# Commands that make sense (or must be tried) while the TV looks off.
+_ALLOWED_WHEN_OFF = {"async_turn_on", "async_turn_off"}
+
+
+def command(
+    func: Callable[Concatenate[_EntityT, _P], Awaitable[_R]],
+) -> Callable[Concatenate[_EntityT, _P], Awaitable[_R]]:
+    """Turn library errors into translated Home Assistant errors."""
+
+    @wraps(func)
+    async def wrapper(self: _EntityT, *args: _P.args, **kwargs: _P.kwargs) -> _R:
+        placeholders = {"name": self._title, "func": func.__name__}
+        if (
+            func.__name__ not in _ALLOWED_WHEN_OFF
+            and self._client.snapshot.power is not PowerState.ON
+        ):
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="device_off",
+                translation_placeholders=placeholders,
+            )
+        try:
+            return await func(self, *args, **kwargs)
+        except VidaaError as error:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="communication_error",
+                translation_placeholders={**placeholders, "error": str(error)},
+            ) from error
+
+    return wrapper
 
 
 class VidaaEntity(Entity):
@@ -18,6 +62,7 @@ class VidaaEntity(Entity):
     def __init__(self, entry: VidaaConfigEntry) -> None:
         self._client = entry.runtime_data.client
         self._catalog = entry.runtime_data.catalog
+        self._title = entry.title
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             manufacturer="Hisense",

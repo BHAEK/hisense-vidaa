@@ -124,6 +124,28 @@
       "blue": {
         "name": "Blu"
       }
+    },
+    "binary_sensor": {
+      "connection": {
+        "name": "Connessione"
+      }
+    }
+  },
+  "exceptions": {
+    "device_off": {
+      "message": "{name} è spenta, quindi {func} non può essere eseguito."
+    },
+    "communication_error": {
+      "message": "Errore di comunicazione con {name} durante {func}: {error}"
+    },
+    "turn_on_timeout": {
+      "message": "{name} non è tornata in rete dopo la richiesta di accensione."
+    },
+    "unknown_channel": {
+      "message": "La TV non ha il canale '{channel}'."
+    },
+    "unsupported_media_type": {
+      "message": "Il tipo di media '{media_type}' non è supportato."
     }
   }
 }

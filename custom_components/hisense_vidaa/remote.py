@@ -14,7 +14,7 @@ from vidaa_tv import PowerState, RemoteKey
 
 from . import VidaaConfigEntry
 from .const import TURN_ON_WAIT_SECONDS
-from .entity import VidaaEntity
+from .entity import VidaaEntity, command
 
 _DEFAULT_DELAY = 0.4
 
@@ -44,12 +44,15 @@ class VidaaRemote(VidaaEntity, RemoteEntity):
     def is_on(self) -> bool:
         return self._client.snapshot.power is PowerState.ON
 
+    @command
     async def async_turn_on(self, **kwargs: Any) -> None:
         await self._client.turn_on(wait=TURN_ON_WAIT_SECONDS)
 
+    @command
     async def async_turn_off(self, **kwargs: Any) -> None:
         await self._client.turn_off()
 
+    @command
     async def async_send_command(self, command: Iterable[str], **kwargs: Any) -> None:
         repeats = kwargs.get(ATTR_NUM_REPEATS, 1)
         delay = kwargs.get(ATTR_DELAY_SECS, _DEFAULT_DELAY)

@@ -9,7 +9,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from vidaa_tv import PowerState
 
 from . import VidaaConfigEntry
-from .entity import VidaaEntity
+from .entity import VidaaEntity, command
 
 
 async def async_setup_entry(
@@ -26,7 +26,6 @@ class _VidaaSelect(VidaaEntity, SelectEntity):
 
 class VidaaSourceSelect(_VidaaSelect):
     _attr_translation_key = "source"
-    _attr_icon = "mdi:video-input-hdmi"
 
     def __init__(self, entry: VidaaConfigEntry) -> None:
         super().__init__(entry)
@@ -45,13 +44,13 @@ class VidaaSourceSelect(_VidaaSelect):
             return "TV"
         return state.source_name if state.source_name in self.options else None
 
+    @command
     async def async_select_option(self, option: str) -> None:
         await self._client.sources.select(option)
 
 
 class VidaaAppSelect(_VidaaSelect):
     _attr_translation_key = "app"
-    _attr_icon = "mdi:apps"
 
     def __init__(self, entry: VidaaConfigEntry) -> None:
         super().__init__(entry)
@@ -72,5 +71,6 @@ class VidaaAppSelect(_VidaaSelect):
                 return app.name
         return None
 
+    @command
     async def async_select_option(self, option: str) -> None:
         await self._client.apps.launch(option)

@@ -11,7 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from vidaa_tv import RemoteKey
 
 from . import VidaaConfigEntry
-from .entity import VidaaEntity
+from .entity import VidaaEntity, command
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -19,41 +19,40 @@ class VidaaButtonDescription(ButtonEntityDescription):
     remote_key: RemoteKey
 
 
-def _button(key: RemoteKey, icon: str, *, default: bool = True) -> VidaaButtonDescription:
+def _button(key: RemoteKey, *, default: bool = True) -> VidaaButtonDescription:
     return VidaaButtonDescription(
         key=key.name.lower(),
         translation_key=key.name.lower(),
-        icon=icon,
         remote_key=key,
         entity_registry_enabled_default=default,
     )
 
 
 BUTTONS: tuple[VidaaButtonDescription, ...] = (
-    _button(RemoteKey.HOME, "mdi:home"),
-    _button(RemoteKey.MENU, "mdi:menu"),
-    _button(RemoteKey.BACK, "mdi:arrow-left"),
-    _button(RemoteKey.EXIT, "mdi:exit-to-app"),
-    _button(RemoteKey.EPG, "mdi:television-guide"),
-    _button(RemoteKey.SUBTITLE, "mdi:subtitles"),
-    _button(RemoteKey.SOURCES, "mdi:video-input-hdmi"),
-    _button(RemoteKey.MUTE, "mdi:volume-mute"),
-    _button(RemoteKey.CHANNEL_UP, "mdi:chevron-up"),
-    _button(RemoteKey.CHANNEL_DOWN, "mdi:chevron-down"),
-    _button(RemoteKey.UP, "mdi:arrow-up-bold"),
-    _button(RemoteKey.DOWN, "mdi:arrow-down-bold"),
-    _button(RemoteKey.LEFT, "mdi:arrow-left-bold"),
-    _button(RemoteKey.RIGHT, "mdi:arrow-right-bold"),
-    _button(RemoteKey.OK, "mdi:checkbox-blank-circle-outline"),
-    _button(RemoteKey.PLAY, "mdi:play", default=False),
-    _button(RemoteKey.PAUSE, "mdi:pause", default=False),
-    _button(RemoteKey.STOP, "mdi:stop", default=False),
-    _button(RemoteKey.REWIND, "mdi:rewind", default=False),
-    _button(RemoteKey.FAST_FORWARD, "mdi:fast-forward", default=False),
-    _button(RemoteKey.RED, "mdi:circle", default=False),
-    _button(RemoteKey.GREEN, "mdi:circle", default=False),
-    _button(RemoteKey.YELLOW, "mdi:circle", default=False),
-    _button(RemoteKey.BLUE, "mdi:circle", default=False),
+    _button(RemoteKey.HOME),
+    _button(RemoteKey.MENU),
+    _button(RemoteKey.BACK),
+    _button(RemoteKey.EXIT),
+    _button(RemoteKey.EPG),
+    _button(RemoteKey.SUBTITLE),
+    _button(RemoteKey.SOURCES),
+    _button(RemoteKey.MUTE),
+    _button(RemoteKey.CHANNEL_UP),
+    _button(RemoteKey.CHANNEL_DOWN),
+    _button(RemoteKey.UP),
+    _button(RemoteKey.DOWN),
+    _button(RemoteKey.LEFT),
+    _button(RemoteKey.RIGHT),
+    _button(RemoteKey.OK),
+    _button(RemoteKey.PLAY, default=False),
+    _button(RemoteKey.PAUSE, default=False),
+    _button(RemoteKey.STOP, default=False),
+    _button(RemoteKey.REWIND, default=False),
+    _button(RemoteKey.FAST_FORWARD, default=False),
+    _button(RemoteKey.RED, default=False),
+    _button(RemoteKey.GREEN, default=False),
+    _button(RemoteKey.YELLOW, default=False),
+    _button(RemoteKey.BLUE, default=False),
 )
 
 
@@ -71,5 +70,6 @@ class VidaaButton(VidaaEntity, ButtonEntity):
         self.entity_description = description
         self._attr_unique_id = f"{entry.entry_id}_{description.key}"
 
+    @command
     async def async_press(self) -> None:
         await self._client.remote.press(self.entity_description.remote_key)
