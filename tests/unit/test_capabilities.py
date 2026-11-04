@@ -81,3 +81,23 @@ async def test_volume_steps_when_audio_is_arc() -> None:
     keys = [m.payload for m in transport.published if b"KEY_" in m.payload]
     assert keys == [b"KEY_VOLUMEUP", b"KEY_VOLUMEUP"]
     assert result.level == 12
+
+
+async def test_volume_set_level_uses_absolute_command_without_arc() -> None:
+    transport, session = make()
+    volume = VolumeControl(session, RemoteControl(session), step_delay=0)
+
+    async def tv() -> None:
+        topic = "/remoteapp/mobile/broadcast/platform_service/actions/volumechange"
+        await asyncio.sleep(0.01)
+        await transport.deliver(topic, b'{"volume_type":0,"volume_value":10}')
+        await asyncio.sleep(0.05)
+        await transport.deliver(topic, b'{"volume_type":0,"volume_value":30}')
+
+    reply = asyncio.create_task(tv())
+    result = await volume.set_level(30)
+    await reply
+    assert any(
+        m.payload == b"30" and m.topic.endswith("/changevolume") for m in transport.published
+    )
+    assert result.level == 30
