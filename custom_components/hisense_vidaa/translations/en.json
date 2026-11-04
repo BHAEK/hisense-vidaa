@@ -1,0 +1,129 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Hisense VIDAA TV",
+        "description": "Turn the TV on, then enter its address. A PIN will appear on the TV screen.",
+        "data": {
+          "host": "Host",
+          "mac": "TV MAC address (needed to turn it on)"
+        }
+      },
+      "pin": {
+        "title": "Enter the PIN",
+        "description": "Type the PIN shown on the TV screen within about a minute.",
+        "data": {
+          "pin": "PIN"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the TV. Make sure it is on.",
+      "invalid_pin": "The PIN was rejected. Try again."
+    },
+    "abort": {
+      "already_configured": "This TV is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "source": {
+        "name": "Source"
+      },
+      "channel": {
+        "name": "Channel"
+      },
+      "programme": {
+        "name": "Programme"
+      },
+      "programme_end": {
+        "name": "Programme end"
+      },
+      "volume": {
+        "name": "Volume"
+      }
+    },
+    "select": {
+      "source": {
+        "name": "Source"
+      },
+      "app": {
+        "name": "App"
+      }
+    },
+    "button": {
+      "home": {
+        "name": "Home"
+      },
+      "menu": {
+        "name": "Menu"
+      },
+      "back": {
+        "name": "Back"
+      },
+      "exit": {
+        "name": "Exit"
+      },
+      "epg": {
+        "name": "Guide"
+      },
+      "subtitle": {
+        "name": "Subtitles"
+      },
+      "sources": {
+        "name": "Sources"
+      },
+      "mute": {
+        "name": "Mute"
+      },
+      "channel_up": {
+        "name": "Channel up"
+      },
+      "channel_down": {
+        "name": "Channel down"
+      },
+      "up": {
+        "name": "Up"
+      },
+      "down": {
+        "name": "Down"
+      },
+      "left": {
+        "name": "Left"
+      },
+      "right": {
+        "name": "Right"
+      },
+      "ok": {
+        "name": "OK"
+      },
+      "play": {
+        "name": "Play"
+      },
+      "pause": {
+        "name": "Pause"
+      },
+      "stop": {
+        "name": "Stop"
+      },
+      "rewind": {
+        "name": "Rewind"
+      },
+      "fast_forward": {
+        "name": "Fast forward"
+      },
+      "red": {
+        "name": "Red"
+      },
+      "green": {
+        "name": "Green"
+      },
+      "yellow": {
+        "name": "Yellow"
+      },
+      "blue": {
+        "name": "Blue"
+      }
+    }
+  }
+}

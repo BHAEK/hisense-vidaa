@@ -1,11 +1,16 @@
 {
   "domain": "hisense_vidaa",
   "name": "Hisense VIDAA",
-  "codeowners": ["@BHAEK"],
+  "codeowners": [
+    "@BHAEK"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/BHAEK/hisense-vidaa",
+  "integration_type": "device",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/BHAEK/hisense-vidaa/issues",
-  "requirements": [],
+  "requirements": [
+    "vidaa-tv[mqtt]==0.1.0"
+  ],
   "version": "0.1.0"
 }

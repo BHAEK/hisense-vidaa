@@ -1,0 +1,129 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "TV Hisense VIDAA",
+        "description": "Accendi la TV, poi inserisci il suo indirizzo. Sullo schermo comparirà un PIN.",
+        "data": {
+          "host": "Host",
+          "mac": "Indirizzo MAC della TV (serve per accenderla)"
+        }
+      },
+      "pin": {
+        "title": "Inserisci il PIN",
+        "description": "Digita il PIN mostrato sullo schermo della TV entro circa un minuto.",
+        "data": {
+          "pin": "PIN"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossibile raggiungere la TV. Verifica che sia accesa.",
+      "invalid_pin": "PIN rifiutato. Riprova."
+    },
+    "abort": {
+      "already_configured": "Questa TV è già configurata."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "source": {
+        "name": "Sorgente"
+      },
+      "channel": {
+        "name": "Canale"
+      },
+      "programme": {
+        "name": "Programma"
+      },
+      "programme_end": {
+        "name": "Fine programma"
+      },
+      "volume": {
+        "name": "Volume"
+      }
+    },
+    "select": {
+      "source": {
+        "name": "Sorgente"
+      },
+      "app": {
+        "name": "App"
+      }
+    },
+    "button": {
+      "home": {
+        "name": "Home"
+      },
+      "menu": {
+        "name": "Menu"
+      },
+      "back": {
+        "name": "Indietro"
+      },
+      "exit": {
+        "name": "Esci"
+      },
+      "epg": {
+        "name": "Guida TV"
+      },
+      "subtitle": {
+        "name": "Sottotitoli"
+      },
+      "sources": {
+        "name": "Sorgenti"
+      },
+      "mute": {
+        "name": "Muto"
+      },
+      "channel_up": {
+        "name": "Canale su"
+      },
+      "channel_down": {
+        "name": "Canale giù"
+      },
+      "up": {
+        "name": "Su"
+      },
+      "down": {
+        "name": "Giù"
+      },
+      "left": {
+        "name": "Sinistra"
+      },
+      "right": {
+        "name": "Destra"
+      },
+      "ok": {
+        "name": "OK"
+      },
+      "play": {
+        "name": "Play"
+      },
+      "pause": {
+        "name": "Pausa"
+      },
+      "stop": {
+        "name": "Stop"
+      },
+      "rewind": {
+        "name": "Riavvolgi"
+      },
+      "fast_forward": {
+        "name": "Avanti veloce"
+      },
+      "red": {
+        "name": "Rosso"
+      },
+      "green": {
+        "name": "Verde"
+      },
+      "yellow": {
+        "name": "Giallo"
+      },
+      "blue": {
+        "name": "Blu"
+      }
+    }
+  }
+}
