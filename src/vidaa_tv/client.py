@@ -13,6 +13,7 @@ from vidaa_tv.capabilities.remote import RemoteControl
 from vidaa_tv.capabilities.sources import Sources
 from vidaa_tv.capabilities.volume import VolumeControl
 from vidaa_tv.discovery import wake
+from vidaa_tv.discovery.neighbour import lookup_mac
 from vidaa_tv.discovery.reachability import DEFAULT_PORT, wait_until_reachable
 from vidaa_tv.errors import UnsupportedFeatureError
 from vidaa_tv.protocol.auth import Credentials, static_credentials
@@ -102,6 +103,17 @@ class VidaaClient:
     def add_listener(self, listener: SnapshotListener) -> Callable[[], None]:
         """Be notified whenever the snapshot changes; call the result to stop."""
         return self._tracker.add_listener(listener)
+
+    # -- identity ----------------------------------------------------------
+    @property
+    def mac(self) -> str | None:
+        return self._mac
+
+    async def resolve_mac(self) -> str | None:
+        """Learn the TV's MAC from the neighbour table; keeps a known value."""
+        if self._mac is None:
+            self._mac = await lookup_mac(self._host)
+        return self._mac
 
     # -- power -------------------------------------------------------------
     async def turn_on(self, *, wait: float = 60.0) -> bool:
