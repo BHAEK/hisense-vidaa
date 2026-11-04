@@ -32,15 +32,16 @@ picture settings, screenshots, programme guide data, recordings.
 import asyncio
 from vidaa_tv import VidaaClient, RemoteKey, mqtt_transport_factory
 
+
 async def main() -> None:
     tv = VidaaClient(
         "192.168.1.50",
-        device_id="AA:BB:CC:DD:EE:01",      # your paired client identity
-        mac="AA:BB:CC:DD:EE:FF",            # the TV's MAC, only needed to wake it
+        device_id="AA:BB:CC:DD:EE:01",  # your paired client identity
+        mac="AA:BB:CC:DD:EE:FF",  # the TV's MAC, only needed to wake it
         transport_factory=mqtt_transport_factory(),
     )
     tv.add_listener(lambda snapshot: print(snapshot.power, snapshot.state))
-    await tv.start()                         # connects and reconnects in the background
+    await tv.start()  # connects and reconnects in the background
     await tv.wait_connected(10)
 
     await tv.remote.press(RemoteKey.HOME)
@@ -48,6 +49,7 @@ async def main() -> None:
     await tv.apps.launch("YouTube")
     await tv.turn_off()
     await tv.stop()
+
 
 asyncio.run(main())
 ```
@@ -59,7 +61,7 @@ flow = PairingFlow(host, mqtt_transport_factory())
 if await flow.start() is PairingOutcome.PIN_REQUIRED:
     await flow.submit_pin(input("PIN: "))
 await flow.close()
-print(flow.device_id)   # keep it: this is the identity the TV now trusts
+print(flow.device_id)  # keep it: this is the identity the TV now trusts
 ```
 
 ## Home Assistant
@@ -68,11 +70,12 @@ The `custom_components/hisense_vidaa` folder is a thin adapter over the library.
 
 | Platform | Entities |
 | --- | --- |
-| `media_player` | power, volume step, mute, source and app selection, channel by number/name |
+| `media_player` | power, volume (step; absolute when audio is not on ARC), mute, play/pause/stop keys, source and app selection, channel by number/name, programme duration and position, media browser (channels and apps) |
 | `remote` | send any key, with repeats |
 | `sensor` | source, channel, programme, programme end, volume |
 | `select` | input source, app |
 | `button` | common remote keys |
+| `binary_sensor` | connection status (diagnostic) |
 
 Home Assistant keeps its configuration folder off the import path, so for manual
 installs build a self-contained copy of the component:
@@ -84,7 +87,10 @@ python tools/build_ha_bundle.py        # writes dist/hisense_vidaa_ha_test.zip
 Unzip it into the Home Assistant configuration directory (it only adds
 `custom_components/hisense_vidaa`), restart, then add **Hisense VIDAA** from
 *Settings → Devices & services* with the TV's address and, optionally, its MAC.
-Keep the TV on and watch for the PIN.
+Keep the TV on and watch for the PIN. The MAC address may be left empty: it is read from
+the host's neighbour table once the TV is connected (same network segment required) and
+stored. Commands sent while the TV is off fail with a clear message, and a diagnostics
+download with identifiers redacted is available from the device page.
 
 ## Requirements and TV settings
 
