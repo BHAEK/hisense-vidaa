@@ -73,6 +73,20 @@ class Programme:
     start: int | None = None  # unix seconds
     end: int | None = None  # unix seconds
 
+    @property
+    def duration(self) -> int | None:
+        """Length in seconds, when both ends are known."""
+        if self.start is None or self.end is None or self.end <= self.start:
+            return None
+        return self.end - self.start
+
+    def position(self, now: float) -> int | None:
+        """Seconds elapsed at ``now`` (unix seconds), clamped to the programme."""
+        duration = self.duration
+        if duration is None or self.start is None:
+            return None
+        return max(0, min(duration, int(now - self.start)))
+
 
 @dataclass(frozen=True, slots=True)
 class TvState:
