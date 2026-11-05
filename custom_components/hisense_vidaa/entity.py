@@ -10,10 +10,11 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
 
-from . import VidaaConfigEntry
 from .const import DOMAIN
+from .runtime import VidaaConfigEntry
 from .vidaa_tv import PowerState
 from .vidaa_tv.errors import VidaaError
+from .vidaa_tv.tracker import Snapshot
 
 _EntityT = TypeVar("_EntityT", bound="VidaaEntity")
 _P = ParamSpec("_P")
@@ -70,7 +71,9 @@ class VidaaEntity(Entity):
         )
 
     async def async_added_to_hass(self) -> None:
-        self.async_on_remove(
-            self._client.add_listener(lambda _snapshot: self.async_write_ha_state())
-        )
+        self.async_on_remove(self._client.add_listener(self._handle_snapshot))
         self.async_on_remove(self._catalog.add_listener(self.async_write_ha_state))
+
+    def _handle_snapshot(self, snapshot: Snapshot) -> None:
+        """Called when the TV pushed a change; subclasses may refresh cached values first."""
+        self.async_write_ha_state()

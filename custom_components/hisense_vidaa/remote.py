@@ -8,18 +8,18 @@ from typing import Any
 
 from homeassistant.components.remote import ATTR_DELAY_SECS, ATTR_NUM_REPEATS, RemoteEntity
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from . import VidaaConfigEntry
-from .const import TURN_ON_WAIT_SECONDS
+from .const import DOMAIN, WAKE_WATCH_SECONDS
 from .entity import VidaaEntity, command
+from .runtime import VidaaConfigEntry
 from .vidaa_tv import PowerState, RemoteKey
 
 _DEFAULT_DELAY = 0.4
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     async_add_entities([VidaaRemote(entry)])
 
@@ -33,7 +33,7 @@ def _resolve(command: str) -> str:
 
 
 class VidaaRemote(VidaaEntity, RemoteEntity):
-    _attr_name = "Remote"
+    _attr_translation_key = "remote"
 
     def __init__(self, entry: VidaaConfigEntry) -> None:
         super().__init__(entry)
@@ -45,11 +45,15 @@ class VidaaRemote(VidaaEntity, RemoteEntity):
 
     @command
     async def async_turn_on(self, **kwargs: Any) -> None:
-        await self._client.turn_on(wait=TURN_ON_WAIT_SECONDS)
+        await self._client.wake()
+        self.hass.async_create_background_task(
+            self._client.wait_for_wake(WAKE_WATCH_SECONDS), f"{DOMAIN} wake watch"
+        )
 
     @command
     async def async_turn_off(self, **kwargs: Any) -> None:
-        await self._client.turn_off()
+        if self._client.snapshot.power is PowerState.ON:
+            await self._client.turn_off()
 
     @command
     async def async_send_command(self, command: Iterable[str], **kwargs: Any) -> None:

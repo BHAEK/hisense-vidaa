@@ -6,10 +6,10 @@ from dataclasses import dataclass
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from . import VidaaConfigEntry
 from .entity import VidaaEntity, command
+from .runtime import VidaaConfigEntry
 from .vidaa_tv import RemoteKey
 
 
@@ -56,7 +56,7 @@ BUTTONS: tuple[VidaaButtonDescription, ...] = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     async_add_entities(VidaaButton(entry, description) for description in BUTTONS)
 

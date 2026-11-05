@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from . import VidaaConfigEntry
 from .entity import VidaaEntity, command
+from .runtime import VidaaConfigEntry
 from .vidaa_tv import PowerState
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     async_add_entities([VidaaSourceSelect(entry), VidaaAppSelect(entry)])
 

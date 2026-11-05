@@ -129,6 +129,11 @@
       "connection": {
         "name": "Connection"
       }
+    },
+    "remote": {
+      "remote": {
+        "name": "Remote"
+      }
     }
   },
   "exceptions": {
@@ -137,9 +142,6 @@
     },
     "communication_error": {
       "message": "Error communicating with {name} during {func}: {error}"
-    },
-    "turn_on_timeout": {
-      "message": "{name} did not come back on the network after the wake-up request."
     },
     "unknown_channel": {
       "message": "The TV has no channel '{channel}'."

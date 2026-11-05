@@ -5,5 +5,5 @@ DOMAIN = "hisense_vidaa"
 CONF_DEVICE_ID = "device_id"
 CONF_MAC = "mac"
 
-# Waiting for a TV to boot after a wake-up must not block a service call for long.
-TURN_ON_WAIT_SECONDS = 45.0
+# How long a background check waits for the TV to come back after a wake-up request.
+WAKE_WATCH_SECONDS = 60.0

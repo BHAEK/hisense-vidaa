@@ -65,7 +65,7 @@ class VidaaConfigFlow(ConfigFlow, domain=DOMAIN):
         device_id = self._pairing.device_id
         await self._close_pairing()
         return self.async_create_entry(
-            title=f"Hisense TV ({self._host})",
+            title="Hisense TV",
             data={CONF_HOST: self._host, CONF_MAC: self._mac, CONF_DEVICE_ID: device_id},
         )
 

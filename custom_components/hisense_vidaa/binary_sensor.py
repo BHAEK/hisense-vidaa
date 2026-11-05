@@ -8,14 +8,14 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from . import VidaaConfigEntry
 from .entity import VidaaEntity
+from .runtime import VidaaConfigEntry
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     async_add_entities([VidaaConnectionSensor(entry)])
 

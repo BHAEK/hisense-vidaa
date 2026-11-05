@@ -129,6 +129,11 @@
       "connection": {
         "name": "Connessione"
       }
+    },
+    "remote": {
+      "remote": {
+        "name": "Telecomando"
+      }
     }
   },
   "exceptions": {
@@ -137,9 +142,6 @@
     },
     "communication_error": {
       "message": "Errore di comunicazione con {name} durante {func}: {error}"
-    },
-    "turn_on_timeout": {
-      "message": "{name} non è tornata in rete dopo la richiesta di accensione."
     },
     "unknown_channel": {
       "message": "La TV non ha il canale '{channel}'."

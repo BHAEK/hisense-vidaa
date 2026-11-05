@@ -9,8 +9,8 @@ from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
 
-from . import VidaaConfigEntry
 from .const import CONF_DEVICE_ID, CONF_MAC
+from .runtime import VidaaConfigEntry
 
 TO_REDACT = {CONF_HOST, CONF_MAC, CONF_DEVICE_ID, "device_id", "unique_id", "title"}
 

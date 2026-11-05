@@ -14,10 +14,10 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from . import VidaaConfigEntry
 from .entity import VidaaEntity
+from .runtime import VidaaConfigEntry
 from .vidaa_tv import PowerState
 from .vidaa_tv.tracker import Snapshot
 
@@ -75,7 +75,7 @@ SENSORS: tuple[VidaaSensorDescription, ...] = (
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     async_add_entities(VidaaSensor(entry, description) for description in SENSORS)
 

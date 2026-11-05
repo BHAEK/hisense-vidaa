@@ -15,14 +15,15 @@ from homeassistant.components.media_player import (
     MediaType,
 )
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.exceptions import ServiceValidationError
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util import dt as dt_util
 
-from . import VidaaConfigEntry
-from .const import DOMAIN, TURN_ON_WAIT_SECONDS
+from .const import DOMAIN, WAKE_WATCH_SECONDS
 from .entity import VidaaEntity, command
+from .runtime import VidaaConfigEntry
 from .vidaa_tv import PowerState, RemoteKey
+from .vidaa_tv.tracker import Snapshot
 
 _BASE_FEATURES = (
     MediaPlayerEntityFeature.TURN_ON
@@ -45,7 +46,7 @@ _APPS = "apps"
 
 
 async def async_setup_entry(
-    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant, entry: VidaaConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     async_add_entities([VidaaMediaPlayer(entry)])
 
@@ -57,6 +58,22 @@ class VidaaMediaPlayer(VidaaEntity, MediaPlayerEntity):
     def __init__(self, entry: VidaaConfigEntry) -> None:
         super().__init__(entry)
         self._attr_unique_id = entry.entry_id
+        self._muted = False
+        self._position: int | None = None
+        self._position_updated_at: datetime | None = None
+        self._refresh_position(self._client.snapshot)
+
+    def _refresh_position(self, snapshot: Snapshot) -> None:
+        """Freeze the elapsed time at the moment the TV reported a change."""
+        state = snapshot.state
+        programme = state.programme if state else None
+        now = dt_util.utcnow()
+        self._position = programme.position(now.timestamp()) if programme else None
+        self._position_updated_at = now if self._position is not None else None
+
+    def _handle_snapshot(self, snapshot: Snapshot) -> None:
+        self._refresh_position(snapshot)
+        super()._handle_snapshot(snapshot)
 
     # -- state ---------------------------------------------------------------
     @property
@@ -128,28 +145,29 @@ class VidaaMediaPlayer(VidaaEntity, MediaPlayerEntity):
 
     @property
     def media_position(self) -> int | None:
-        state = self._client.snapshot.state
-        if state is None or state.programme is None:
-            return None
-        return state.programme.position(dt_util.utcnow().timestamp())
+        return self._position
 
     @property
     def media_position_updated_at(self) -> datetime | None:
-        return dt_util.utcnow() if self.media_position is not None else None
+        return self._position_updated_at
+
+    @property
+    def is_volume_muted(self) -> bool:
+        # The TV cannot report mute, so this is what we last asked for.
+        return self._muted
 
     # -- commands ------------------------------------------------------------
     @command
     async def async_turn_on(self) -> None:
-        if not await self._client.turn_on(wait=TURN_ON_WAIT_SECONDS):
-            raise HomeAssistantError(
-                translation_domain=DOMAIN,
-                translation_key="turn_on_timeout",
-                translation_placeholders={"name": self._title},
-            )
+        await self._client.wake()
+        self.hass.async_create_background_task(
+            self._client.wait_for_wake(WAKE_WATCH_SECONDS), f"{DOMAIN} wake watch"
+        )
 
     @command
     async def async_turn_off(self) -> None:
-        await self._client.turn_off()
+        if self._client.snapshot.power is PowerState.ON:
+            await self._client.turn_off()
 
     @command
     async def async_volume_up(self) -> None:
@@ -165,8 +183,11 @@ class VidaaMediaPlayer(VidaaEntity, MediaPlayerEntity):
 
     @command
     async def async_mute_volume(self, mute: bool) -> None:
-        # The TV only toggles mute and does not report it, so a request is a toggle.
-        await self._client.volume.mute_toggle()
+        # The TV only toggles mute; send the key only when the request changes our belief.
+        if mute != self._muted:
+            await self._client.volume.mute_toggle()
+            self._muted = mute
+            self.async_write_ha_state()
 
     @command
     async def async_media_play(self) -> None:

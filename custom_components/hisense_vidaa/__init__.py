@@ -5,17 +5,21 @@ This package is a thin adapter: all TV logic lives in the ``vidaa_tv`` library.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import logging
+from collections.abc import Coroutine
+from typing import Any
 
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 
 from .catalog import VidaaCatalog
 from .const import CONF_DEVICE_ID, CONF_MAC, DOMAIN
+from .runtime import VidaaConfigEntry, VidaaData
 from .vidaa_tv import PowerState, VidaaClient, mqtt_transport_factory
 from .vidaa_tv.tracker import Snapshot
+
+_LOGGER = logging.getLogger(__name__)
 
 PLATFORMS = [
     Platform.BINARY_SENSOR,
@@ -27,26 +31,24 @@ PLATFORMS = [
 ]
 
 
-@dataclass
-class VidaaData:
-    client: VidaaClient
-    catalog: VidaaCatalog
-
-
-VidaaConfigEntry = ConfigEntry[VidaaData]
-
-
 async def async_setup_entry(hass: HomeAssistant, entry: VidaaConfigEntry) -> bool:
+    def spawn(name: str, coroutine: Coroutine[Any, Any, Any]) -> None:
+        entry.async_create_background_task(hass, coroutine, f"{DOMAIN} {name}")
+
     client = VidaaClient(
         entry.data[CONF_HOST],
         entry.data[CONF_DEVICE_ID],
         mac=entry.data.get(CONF_MAC),
         transport_factory=mqtt_transport_factory(),
+        task_factory=lambda coroutine: entry.async_create_background_task(
+            hass, coroutine, f"{DOMAIN} connection"
+        ),
     )
     catalog = VidaaCatalog(client)
     entry.runtime_data = VidaaData(client, catalog)
 
     resolving_mac = False
+    published_identity: tuple[Any, ...] | None = None
 
     async def resolve_mac() -> None:
         """Learn the TV's MAC from the ARP table once and remember it."""
@@ -59,9 +61,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: VidaaConfigEntry) -> boo
             resolving_mac = False
 
     def update_device(snapshot: Snapshot) -> None:
+        """Publish model, firmware and MAC to the device registry when they change."""
+        nonlocal published_identity
         info = snapshot.info
         if info is None:
             return
+        identity = (info, client.mac)
+        if identity == published_identity:
+            return
+        published_identity = identity
         connections = (
             {(dr.CONNECTION_NETWORK_MAC, dr.format_mac(client.mac))} if client.mac else set()
         )
@@ -79,12 +87,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: VidaaConfigEntry) -> boo
     def on_snapshot(snapshot: Snapshot) -> None:
         nonlocal resolving_mac
         if snapshot.power is PowerState.ON and not catalog.loaded:
-            hass.async_create_task(catalog.refresh())
+            spawn("catalog", catalog.refresh())
         elif snapshot.power in (PowerState.OFF, PowerState.STANDBY):
             catalog.reset()
         if snapshot.power is PowerState.ON and client.mac is None and not resolving_mac:
             resolving_mac = True
-            hass.async_create_task(resolve_mac())
+            spawn("mac lookup", resolve_mac())
         update_device(snapshot)
 
     entry.async_on_unload(client.add_listener(on_snapshot))
