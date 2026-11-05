@@ -7,22 +7,22 @@ import logging
 from collections.abc import Callable
 from pathlib import Path
 
-from vidaa_tv.capabilities.apps import Apps
-from vidaa_tv.capabilities.channels import Channels
-from vidaa_tv.capabilities.power import PowerControl
-from vidaa_tv.capabilities.remote import RemoteControl
-from vidaa_tv.capabilities.sources import Sources
-from vidaa_tv.capabilities.volume import VolumeControl
-from vidaa_tv.discovery import wake
-from vidaa_tv.discovery.neighbour import lookup_mac
-from vidaa_tv.discovery.reachability import DEFAULT_PORT, wait_until_reachable
-from vidaa_tv.errors import UnsupportedFeatureError
-from vidaa_tv.protocol.auth import Credentials, static_credentials
-from vidaa_tv.protocol.topics import Action
-from vidaa_tv.session import Session
-from vidaa_tv.supervisor import Supervisor, TaskFactory
-from vidaa_tv.tracker import Snapshot, SnapshotListener, StateTracker
-from vidaa_tv.transport.base import Transport
+from .capabilities.apps import Apps
+from .capabilities.channels import Channels
+from .capabilities.power import PowerControl
+from .capabilities.remote import RemoteControl
+from .capabilities.sources import Sources
+from .capabilities.volume import VolumeControl
+from .discovery import wake
+from .discovery.neighbour import lookup_mac
+from .discovery.reachability import DEFAULT_PORT, wait_until_reachable
+from .errors import UnsupportedFeatureError
+from .protocol.auth import Credentials, static_credentials
+from .protocol.topics import Action
+from .session import Session
+from .supervisor import Supervisor, TaskFactory
+from .tracker import Snapshot, SnapshotListener, StateTracker
+from .transport.base import Transport
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ def mqtt_transport_factory(
     """Build the default MQTT-over-TLS transport (needs the ``mqtt`` extra)."""
 
     def factory(host: str, credentials: Credentials) -> Transport:
-        from vidaa_tv.transport.mqtt import MqttTransport, TlsConfig
+        from .transport.mqtt import MqttTransport, TlsConfig
 
         tls = TlsConfig(cert_file=cert_file, key_file=key_file)
         return MqttTransport(host, credentials, tls=tls)

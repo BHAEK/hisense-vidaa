@@ -6,8 +6,8 @@ standby); see ``vidaa_tv.discovery.wake`` and ``VidaaClient.turn_on``.
 
 from __future__ import annotations
 
-from vidaa_tv.capabilities.remote import RemoteControl
-from vidaa_tv.keys import RemoteKey
+from ..keys import RemoteKey
+from .remote import RemoteControl
 
 
 class PowerControl:

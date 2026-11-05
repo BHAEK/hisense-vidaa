@@ -10,8 +10,8 @@ from __future__ import annotations
 from collections.abc import Iterable
 from typing import Any
 
-from vidaa_tv.errors import ProtocolError
-from vidaa_tv.models import (
+from ..errors import ProtocolError
+from ..models import (
     App,
     Channel,
     ChannelList,
@@ -21,7 +21,7 @@ from vidaa_tv.models import (
     TvState,
     Volume,
 )
-from vidaa_tv.protocol.reply import Reply
+from .reply import Reply
 
 _SOURCE_LIST_KEYS = ("sources", "sourcelist", "source_list")
 

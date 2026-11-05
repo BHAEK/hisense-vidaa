@@ -8,12 +8,12 @@ from __future__ import annotations
 
 import asyncio
 
-from vidaa_tv.capabilities.remote import RemoteControl
-from vidaa_tv.keys import RemoteKey
-from vidaa_tv.models import Volume
-from vidaa_tv.protocol import parsers
-from vidaa_tv.protocol.topics import Action
-from vidaa_tv.session import Session
+from ..keys import RemoteKey
+from ..models import Volume
+from ..protocol import parsers
+from ..protocol.topics import Action
+from ..session import Session
+from .remote import RemoteControl
 
 MAX_STEPS = 50
 

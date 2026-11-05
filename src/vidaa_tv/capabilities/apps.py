@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from vidaa_tv.errors import UnsupportedFeatureError
-from vidaa_tv.models import App
-from vidaa_tv.protocol import parsers
-from vidaa_tv.protocol.topics import Action
-from vidaa_tv.session import Session
+from ..errors import UnsupportedFeatureError
+from ..models import App
+from ..protocol import parsers
+from ..protocol.topics import Action
+from ..session import Session
 
 
 class Apps:

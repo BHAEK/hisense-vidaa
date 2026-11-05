@@ -10,10 +10,10 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 
-from vidaa_tv.errors import ProtocolError
-from vidaa_tv.models import PowerState, TvInfo, TvState, Volume
-from vidaa_tv.protocol import parsers
-from vidaa_tv.protocol.reply import Reply
+from .errors import ProtocolError
+from .models import PowerState, TvInfo, TvState, Volume
+from .protocol import parsers
+from .protocol.reply import Reply
 
 
 @dataclass(frozen=True, slots=True)

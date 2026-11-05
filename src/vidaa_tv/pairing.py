@@ -12,12 +12,12 @@ import secrets
 from collections.abc import Callable
 from enum import StrEnum
 
-from vidaa_tv.errors import AuthenticationError
-from vidaa_tv.protocol.auth import Credentials, static_credentials
-from vidaa_tv.protocol.reply import Reply
-from vidaa_tv.protocol.topics import Action
-from vidaa_tv.session import Session
-from vidaa_tv.transport.base import Transport
+from .errors import AuthenticationError
+from .protocol.auth import Credentials, static_credentials
+from .protocol.reply import Reply
+from .protocol.topics import Action
+from .session import Session
+from .transport.base import Transport
 
 _CONNECT_PAYLOAD = {"app_version": 2, "connect_result": 0, "device_type": "Mobile App"}
 

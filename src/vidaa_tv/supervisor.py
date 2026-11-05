@@ -14,8 +14,8 @@ import logging
 from collections.abc import Awaitable, Callable, Coroutine, Sequence
 from typing import Any
 
-from vidaa_tv.errors import VidaaError
-from vidaa_tv.transport.base import Transport
+from .errors import VidaaError
+from .transport.base import Transport
 
 _LOGGER = logging.getLogger(__name__)
 DEFAULT_BACKOFF: Sequence[float] = (1.0, 2.0, 5.0, 10.0, 20.0, 30.0)

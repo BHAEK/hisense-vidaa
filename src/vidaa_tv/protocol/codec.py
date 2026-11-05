@@ -6,7 +6,7 @@ import json
 from collections.abc import Mapping
 from typing import Any
 
-from vidaa_tv.errors import ProtocolError
+from ..errors import ProtocolError
 
 Payload = Mapping[str, Any] | str | None
 

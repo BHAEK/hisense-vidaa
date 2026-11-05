@@ -5,11 +5,11 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Callable
 
-from vidaa_tv.errors import ConnectionFailedError, ProtocolError
-from vidaa_tv.protocol import codec
-from vidaa_tv.protocol.reply import Reply
-from vidaa_tv.protocol.topics import Action, Service, command_topic, mobile_filter
-from vidaa_tv.transport.base import Message, Transport
+from .errors import ConnectionFailedError, ProtocolError
+from .protocol import codec
+from .protocol.reply import Reply
+from .protocol.topics import Action, Service, command_topic, mobile_filter
+from .transport.base import Message, Transport
 
 DEFAULT_TIMEOUT = 4.0
 

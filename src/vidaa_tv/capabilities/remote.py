@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from vidaa_tv.keys import RemoteKey
-from vidaa_tv.protocol.topics import Action
-from vidaa_tv.session import Session
+from ..keys import RemoteKey
+from ..protocol.topics import Action
+from ..session import Session
 
 
 class RemoteControl:

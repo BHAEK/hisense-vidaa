@@ -13,9 +13,9 @@ from pathlib import Path
 
 import aiomqtt
 
-from vidaa_tv.errors import ConnectionFailedError
-from vidaa_tv.protocol.auth import Credentials
-from vidaa_tv.transport.base import DisconnectHandler, Message, MessageHandler
+from ..errors import ConnectionFailedError
+from ..protocol.auth import Credentials
+from .base import DisconnectHandler, Message, MessageHandler
 
 DEFAULT_PORT = 36669
 _LOGGER = logging.getLogger(__name__)
