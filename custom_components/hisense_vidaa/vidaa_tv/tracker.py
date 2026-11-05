@@ -24,6 +24,7 @@ class Snapshot:
     state: TvState | None = None
     volume: Volume | None = None
     info: TvInfo | None = None
+    auth_required: bool = False  # the TV asked for a PIN: this identity is not paired
 
 
 SnapshotListener = Callable[[Snapshot], None]
@@ -45,7 +46,7 @@ class StateTracker:
 
     def mark_unreachable(self) -> None:
         """Record that the TV cannot be reached (it is off or unplugged)."""
-        self._update(replace(self._snapshot, power=PowerState.OFF))
+        self._update(replace(self._snapshot, power=PowerState.OFF, auth_required=False))
 
     def apply(self, reply: Reply) -> None:
         """Fold one incoming message into the snapshot."""
@@ -67,6 +68,8 @@ class StateTracker:
                         volume=parsers.parse_volume(reply.payload),
                     )
                 )
+            elif reply.topic.endswith("/ui_service/data/authentication"):
+                self._update(replace(self._snapshot, auth_required=True))
             elif last == "capability" and parsers.is_capability(reply):
                 self._update(replace(self._snapshot, info=parsers.parse_tv_info(reply.payload)))
             elif last == "tvsleep":

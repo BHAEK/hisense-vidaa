@@ -81,3 +81,25 @@ async def test_pairing_flow_connects_pairs_and_closes() -> None:
     assert transport.connected
     await flow.close()
     assert not transport.connected
+
+
+async def test_pairing_flow_reads_the_tv_identity() -> None:
+    from vidaa_tv.pairing import PairingFlow
+
+    transport = FakeTransport()
+    flow = PairingFlow("tv", lambda host, creds: transport, timeout=1)
+    await flow._session.open()
+    task = asyncio.create_task(flow.fetch_info())
+    await asyncio.sleep(0.02)
+    topic = f"/remoteapp/mobile/{flow.device_id}$vidaa_common/ui_service/data/capability"
+    await transport.deliver(topic, b'{"softwareVersion":"V1","uniqueDeviceId":"abc"}')
+    info = await task
+    assert info is not None
+    assert (info.software_version, info.device_id) == ("V1", "abc")
+
+
+async def test_pairing_flow_info_is_none_when_the_tv_stays_silent() -> None:
+    from vidaa_tv.pairing import PairingFlow
+
+    flow = PairingFlow("tv", lambda host, creds: FakeTransport(), timeout=0.05)
+    assert await flow.fetch_info() is None

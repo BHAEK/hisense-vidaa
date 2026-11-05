@@ -12,7 +12,9 @@ import secrets
 from collections.abc import Callable
 from enum import StrEnum
 
-from .errors import AuthenticationError
+from .errors import AuthenticationError, ConnectionFailedError
+from .models import TvInfo
+from .protocol import parsers
 from .protocol.auth import Credentials, static_credentials
 from .protocol.reply import Reply
 from .protocol.topics import Action
@@ -102,7 +104,8 @@ class PairingFlow:
         self.device_id = device_id or new_device_id()
         credentials = static_credentials(self.device_id)
         self._transport = transport_factory(host, credentials)
-        self._pairing = Pairing(Session(self._transport, credentials.client_id, timeout=timeout))
+        self._session = Session(self._transport, credentials.client_id, timeout=timeout)
+        self._pairing = Pairing(self._session)
 
     async def start(self) -> PairingOutcome:
         await self._transport.connect()
@@ -110,6 +113,14 @@ class PairingFlow:
 
     async def submit_pin(self, pin: str) -> None:
         await self._pairing.submit_pin(pin)
+
+    async def fetch_info(self) -> TvInfo | None:
+        """Ask the (paired) TV who it is; ``None`` when it does not answer in time."""
+        try:
+            reply = await self._session.request(Action.CAPABILITY, parsers.is_capability)
+        except ConnectionFailedError:
+            return None
+        return parsers.parse_tv_info(reply.payload)
 
     async def close(self) -> None:
         await self._transport.disconnect()

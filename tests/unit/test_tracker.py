@@ -99,3 +99,11 @@ def test_capability_reply_fills_tv_info() -> None:
     info = tracker.snapshot.info
     assert info is not None
     assert (info.software_version, info.board, info.model_code) == ("V1", "MSD6886", "65A_0001")
+
+
+def test_authentication_push_marks_the_identity_as_unpaired_until_reconnect() -> None:
+    tracker = StateTracker()
+    tracker.apply(Reply("/remoteapp/mobile/x/ui_service/data/authentication", None))
+    assert tracker.snapshot.auth_required
+    tracker.mark_unreachable()
+    assert not tracker.snapshot.auth_required
