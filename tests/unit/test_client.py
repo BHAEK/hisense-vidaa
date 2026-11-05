@@ -1,4 +1,9 @@
 import asyncio
+import logging
+from collections.abc import Coroutine
+from typing import Any
+
+import pytest
 
 from tests.fakes import FakeTransport
 from vidaa_tv.client import VidaaClient
@@ -67,3 +72,54 @@ async def test_turn_off_presses_power() -> None:
     client = make(transport)
     await client.turn_off()
     assert transport.published[-1].payload == b"KEY_POWER"
+
+
+async def test_unexpected_connect_error_does_not_end_supervision() -> None:
+    transport = FakeTransport()
+    transport.connect_error = RuntimeError("boom")
+    client = make(transport)
+    await client.start()
+    await settle()
+    assert not client.connected
+    transport.connect_error = None
+    client._supervisor.nudge()
+    assert await client.wait_connected(1)
+    await client.stop()
+
+
+async def test_availability_transitions_are_logged_once(caplog: pytest.LogCaptureFixture) -> None:
+    caplog.set_level(logging.INFO, logger="vidaa_tv.supervisor")
+    transport = FakeTransport()
+    transport.reachable = False
+    client = make(transport)
+    await client.start()
+    await settle()
+    client._supervisor.nudge()
+    await settle()
+    transport.reachable = True
+    client._supervisor.nudge()
+    assert await client.wait_connected(1)
+    await client.stop()
+    messages = [r.getMessage() for r in caplog.records]
+    assert messages.count("tv.local is unavailable") == 1
+    assert messages.count("tv.local is back online") == 1
+
+
+async def test_supervision_uses_the_given_task_factory() -> None:
+    created: list[str] = []
+
+    def factory(coroutine: Coroutine[Any, Any, None]) -> asyncio.Task[None]:
+        created.append("task")
+        return asyncio.create_task(coroutine)
+
+    transport = FakeTransport()
+
+    def transport_factory(host: str, credentials: Credentials) -> Transport:
+        return transport
+
+    client = VidaaClient(
+        "tv.local", "AA:BB:CC:DD:EE:FF", transport_factory=transport_factory, task_factory=factory
+    )
+    await client.start()
+    assert created == ["task"]
+    await client.stop()

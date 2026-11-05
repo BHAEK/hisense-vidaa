@@ -19,12 +19,15 @@ class FakeTransport:
         self.published: list[Message] = []
         self.handlers: dict[str, list[MessageHandler]] = {}
         self.reachable = True
+        self.connect_error: Exception | None = None
         self.connected = False
         self.connect_calls = 0
         self._on_disconnect: DisconnectHandler | None = None
 
     async def connect(self) -> None:
         self.connect_calls += 1
+        if self.connect_error is not None:
+            raise self.connect_error
         if not self.reachable:
             raise ConnectionFailedError("unreachable")
         self.connected = True

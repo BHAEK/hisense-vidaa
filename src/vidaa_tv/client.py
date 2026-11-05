@@ -20,7 +20,7 @@ from vidaa_tv.errors import UnsupportedFeatureError
 from vidaa_tv.protocol.auth import Credentials, static_credentials
 from vidaa_tv.protocol.topics import Action
 from vidaa_tv.session import Session
-from vidaa_tv.supervisor import Supervisor
+from vidaa_tv.supervisor import Supervisor, TaskFactory
 from vidaa_tv.tracker import Snapshot, SnapshotListener, StateTracker
 from vidaa_tv.transport.base import Transport
 
@@ -58,6 +58,7 @@ class VidaaClient:
         mac: str | None = None,
         transport_factory: TransportFactory | None = None,
         timeout: float = 4.0,
+        task_factory: TaskFactory | None = None,
     ) -> None:
         self._host = host
         self._mac = mac
@@ -71,6 +72,8 @@ class VidaaClient:
             self._transport,
             on_connected=self._on_connected,
             on_lost=self._tracker.mark_unreachable,
+            name=host,
+            task_factory=task_factory,
         )
         self.remote = RemoteControl(self._session)
         self.power = PowerControl(self.remote)
