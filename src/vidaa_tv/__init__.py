@@ -1,5 +1,6 @@
 """Async client library for Hisense TVs running VIDAA OS."""
 
+from .__version__ import __version__
 from .client import VidaaClient, mqtt_transport_factory
 from .errors import (
     AuthenticationError,
@@ -20,5 +21,6 @@ __all__ = [
     "UnsupportedFeatureError",
     "VidaaClient",
     "VidaaError",
+    "__version__",
     "mqtt_transport_factory",
 ]
