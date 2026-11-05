@@ -6,6 +6,7 @@ import asyncio
 import contextlib
 import logging
 import ssl
+import warnings
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
@@ -40,7 +41,8 @@ class TlsConfig:
         if self.legacy_compat:
             # Relax the floors for old firmware; a modern OpenSSL may refuse some of
             # them, in which case the defaults are kept and negotiation decides.
-            with contextlib.suppress(ValueError, ssl.SSLError):
+            with contextlib.suppress(ValueError, ssl.SSLError), warnings.catch_warnings():
+                warnings.simplefilter("ignore", DeprecationWarning)
                 context.minimum_version = ssl.TLSVersion.TLSv1
             with contextlib.suppress(ssl.SSLError):
                 context.set_ciphers("DEFAULT:@SECLEVEL=0")
@@ -92,8 +94,12 @@ class MqttTransport:
             raise ConnectionFailedError(f"cannot connect to {self._host}: {exc}") from exc
         self._client = client
         self._listener = asyncio.create_task(self._listen(client))
-        for topic in self._handlers:
-            await client.subscribe(topic)
+        try:
+            for topic in list(self._handlers):
+                await client.subscribe(topic)
+        except aiomqtt.MqttError as exc:
+            await self.disconnect()
+            raise ConnectionFailedError(f"subscription failed: {exc}") from exc
 
     async def disconnect(self) -> None:
         if self._listener is not None:
@@ -120,7 +126,10 @@ class MqttTransport:
         first = topic not in self._handlers
         self._handlers[topic].append(handler)
         if first and self._client is not None:
-            await self._client.subscribe(topic)
+            try:
+                await self._client.subscribe(topic)
+            except aiomqtt.MqttError as exc:
+                raise ConnectionFailedError(f"subscription failed: {exc}") from exc
 
     def _require_client(self) -> aiomqtt.Client:
         if self._client is None:
@@ -128,20 +137,28 @@ class MqttTransport:
         return self._client
 
     async def _listen(self, client: aiomqtt.Client) -> None:
-        with contextlib.suppress(aiomqtt.MqttError):
+        try:
             async for incoming in client.messages:
                 payload = incoming.payload
                 message = Message(
                     topic=str(incoming.topic),
                     payload=payload if isinstance(payload, bytes) else b"",
                 )
-                for topic_filter, handlers in list(self._handlers.items()):
-                    if incoming.topic.matches(topic_filter):
-                        for handler in list(handlers):
-                            try:
-                                await handler(message)
-                            except Exception:  # a faulty handler must not stop the listener
-                                _LOGGER.exception("handler failed for %s", message.topic)
+                await self._dispatch(incoming, message)
+        except aiomqtt.MqttError as exc:
+            _LOGGER.debug("message stream ended: %s", exc)
+        except Exception:
+            _LOGGER.exception("message stream failed unexpectedly")
         # Reaching this point without cancellation means the connection was lost.
         if self._client is client and self._on_disconnect is not None:
             self._on_disconnect()
+
+    async def _dispatch(self, incoming: aiomqtt.Message, message: Message) -> None:
+        for topic_filter, handlers in list(self._handlers.items()):
+            if not incoming.topic.matches(topic_filter):
+                continue
+            for handler in list(handlers):
+                try:
+                    await handler(message)
+                except Exception:  # a faulty handler must not stop the listener
+                    _LOGGER.exception("handler failed for %s", message.topic)
