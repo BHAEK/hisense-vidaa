@@ -9,11 +9,10 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
 
-from vidaa_tv import mqtt_transport_factory
-from vidaa_tv.errors import AuthenticationError, VidaaError
-from vidaa_tv.pairing import PairingFlow, PairingOutcome
-
 from .const import CONF_DEVICE_ID, CONF_MAC, DOMAIN
+from .vidaa_tv import mqtt_transport_factory
+from .vidaa_tv.errors import AuthenticationError, VidaaError
+from .vidaa_tv.pairing import PairingFlow, PairingOutcome
 
 CONF_PIN = "pin"
 

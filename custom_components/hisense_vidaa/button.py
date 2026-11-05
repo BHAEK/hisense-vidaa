@@ -8,10 +8,9 @@ from homeassistant.components.button import ButtonEntity, ButtonEntityDescriptio
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from vidaa_tv import RemoteKey
-
 from . import VidaaConfigEntry
 from .entity import VidaaEntity, command
+from .vidaa_tv import RemoteKey
 
 
 @dataclass(frozen=True, kw_only=True)

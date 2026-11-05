@@ -17,6 +17,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install -e ".[dev,mqtt]"
+      - run: python tools/check_versions.py
+      - run: python tools/sync_vendor.py --check
       - run: ruff check .
       - run: mypy src
       - run: pytest

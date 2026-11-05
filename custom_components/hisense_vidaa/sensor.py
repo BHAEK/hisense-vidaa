@@ -16,11 +16,10 @@ from homeassistant.components.sensor import (
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from vidaa_tv import PowerState
-from vidaa_tv.tracker import Snapshot
-
 from . import VidaaConfigEntry
 from .entity import VidaaEntity
+from .vidaa_tv import PowerState
+from .vidaa_tv.tracker import Snapshot
 
 
 @dataclass(frozen=True, kw_only=True)

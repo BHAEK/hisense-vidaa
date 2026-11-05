@@ -12,11 +12,10 @@ from homeassistant.const import CONF_HOST, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 
-from vidaa_tv import PowerState, VidaaClient, mqtt_transport_factory
-from vidaa_tv.tracker import Snapshot
-
 from .catalog import VidaaCatalog
 from .const import CONF_DEVICE_ID, CONF_MAC, DOMAIN
+from .vidaa_tv import PowerState, VidaaClient, mqtt_transport_factory
+from .vidaa_tv.tracker import Snapshot
 
 PLATFORMS = [
     Platform.BINARY_SENSOR,

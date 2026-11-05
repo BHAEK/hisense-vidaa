@@ -19,11 +19,10 @@ from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import dt as dt_util
 
-from vidaa_tv import PowerState, RemoteKey
-
 from . import VidaaConfigEntry
 from .const import DOMAIN, TURN_ON_WAIT_SECONDS
 from .entity import VidaaEntity, command
+from .vidaa_tv import PowerState, RemoteKey
 
 _BASE_FEATURES = (
     MediaPlayerEntityFeature.TURN_ON

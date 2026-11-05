@@ -6,10 +6,9 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from vidaa_tv import PowerState
-
 from . import VidaaConfigEntry
 from .entity import VidaaEntity, command
+from .vidaa_tv import PowerState
 
 
 async def async_setup_entry(

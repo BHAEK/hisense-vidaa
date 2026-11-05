@@ -10,11 +10,10 @@ from homeassistant.components.remote import ATTR_DELAY_SECS, ATTR_NUM_REPEATS, R
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from vidaa_tv import PowerState, RemoteKey
-
 from . import VidaaConfigEntry
 from .const import TURN_ON_WAIT_SECONDS
 from .entity import VidaaEntity, command
+from .vidaa_tv import PowerState, RemoteKey
 
 _DEFAULT_DELAY = 0.4
 

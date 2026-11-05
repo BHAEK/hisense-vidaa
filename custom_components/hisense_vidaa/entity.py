@@ -10,11 +10,10 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
 
-from vidaa_tv import PowerState
-from vidaa_tv.errors import VidaaError
-
 from . import VidaaConfigEntry
 from .const import DOMAIN
+from .vidaa_tv import PowerState
+from .vidaa_tv.errors import VidaaError
 
 _EntityT = TypeVar("_EntityT", bound="VidaaEntity")
 _P = ParamSpec("_P")

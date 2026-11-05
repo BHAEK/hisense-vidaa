@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
-from vidaa_tv import VidaaClient
-from vidaa_tv.errors import VidaaError
-from vidaa_tv.models import App, Channel, Source
+from .vidaa_tv import VidaaClient
+from .vidaa_tv.errors import VidaaError
+from .vidaa_tv.models import App, Channel, Source
 
 
 class VidaaCatalog:
