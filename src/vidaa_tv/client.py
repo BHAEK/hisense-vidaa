@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from collections.abc import Callable
 from pathlib import Path
 
@@ -22,6 +23,8 @@ from vidaa_tv.session import Session
 from vidaa_tv.supervisor import Supervisor
 from vidaa_tv.tracker import Snapshot, SnapshotListener, StateTracker
 from vidaa_tv.transport.base import Transport
+
+_LOGGER = logging.getLogger(__name__)
 
 TransportFactory = Callable[[str, Credentials], Transport]
 
@@ -120,10 +123,20 @@ class VidaaClient:
         """Wake the TV over the network; True once it accepts connections."""
         if self._mac is None:
             raise UnsupportedFeatureError("the TV MAC address is needed to wake it")
-        await wake.send_wake(self._mac, wake.broadcast_addresses(self._host))
+        addresses = wake.broadcast_addresses(self._host)
+        _LOGGER.info("Sending wake-up packets to %s via %s", self._host, ", ".join(addresses))
+        await wake.send_wake(self._mac, addresses)
         reachable = await wait_until_reachable(self._host, DEFAULT_PORT, timeout=wait)
         if reachable:
+            _LOGGER.info("%s is reachable again after the wake-up request", self._host)
             self._supervisor.nudge()
+        else:
+            _LOGGER.warning(
+                "%s did not accept connections within %.0f s of the wake-up request; "
+                "the TV may be in a standby that ignores network wake-up",
+                self._host,
+                wait,
+            )
         return reachable
 
     async def turn_off(self) -> None:
