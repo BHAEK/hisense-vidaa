@@ -7,6 +7,7 @@ import pytest
 
 from tests.fakes import FakeTransport
 from vidaa_tv.client import VidaaClient
+from vidaa_tv.errors import UnsupportedFeatureError
 from vidaa_tv.models import PowerState
 from vidaa_tv.protocol.auth import Credentials
 from vidaa_tv.transport.base import Transport
@@ -123,3 +124,30 @@ async def test_supervision_uses_the_given_task_factory() -> None:
     await client.start()
     assert created == ["task"]
     await client.stop()
+
+
+async def test_wake_without_mac_is_refused() -> None:
+    client = make(FakeTransport())
+    with pytest.raises(UnsupportedFeatureError):
+        await client.wake()
+
+
+async def test_wake_sends_packets_and_returns_without_waiting(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sent: list[tuple[str, tuple[str, ...]]] = []
+
+    async def fake_send_wake(mac: str, addresses: tuple[str, ...], **kwargs: Any) -> None:
+        sent.append((mac, addresses))
+
+    monkeypatch.setattr("vidaa_tv.client.wake.send_wake", fake_send_wake)
+    transport = FakeTransport()
+
+    def factory(host: str, credentials: Credentials) -> Transport:
+        return transport
+
+    client = VidaaClient(
+        "192.0.2.10", "AA:BB:CC:DD:EE:FF", mac="11:22:33:44:55:66", transport_factory=factory
+    )
+    await client.wake()
+    assert sent == [("11:22:33:44:55:66", ("255.255.255.255", "192.0.2.255"))]

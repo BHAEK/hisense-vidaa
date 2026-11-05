@@ -122,13 +122,16 @@ class VidaaClient:
         return self._mac
 
     # -- power -------------------------------------------------------------
-    async def turn_on(self, *, wait: float = 60.0) -> bool:
-        """Wake the TV over the network; True once it accepts connections."""
+    async def wake(self) -> None:
+        """Send the wake-up packets and return at once; the TV needs seconds to answer."""
         if self._mac is None:
             raise UnsupportedFeatureError("the TV MAC address is needed to wake it")
         addresses = wake.broadcast_addresses(self._host)
         _LOGGER.info("Sending wake-up packets to %s via %s", self._host, ", ".join(addresses))
         await wake.send_wake(self._mac, addresses)
+
+    async def wait_for_wake(self, wait: float = 60.0) -> bool:
+        """Wait for the TV to accept connections after ``wake``; True when it does."""
         reachable = await wait_until_reachable(self._host, DEFAULT_PORT, timeout=wait)
         if reachable:
             _LOGGER.info("%s is reachable again after the wake-up request", self._host)
@@ -141,6 +144,11 @@ class VidaaClient:
                 wait,
             )
         return reachable
+
+    async def turn_on(self, *, wait: float = 60.0) -> bool:
+        """Wake the TV over the network; True once it accepts connections."""
+        await self.wake()
+        return await self.wait_for_wake(wait)
 
     async def turn_off(self) -> None:
         await self.power.turn_off()
