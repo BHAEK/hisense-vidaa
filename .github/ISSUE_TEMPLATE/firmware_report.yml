@@ -1,0 +1,23 @@
+name: New TV or firmware report
+description: Tell us how your TV behaves, or which features work
+labels: [firmware]
+body:
+  - type: input
+    id: tv
+    attributes:
+      label: TV model and software version
+    validations:
+      required: true
+  - type: textarea
+    id: works
+    attributes:
+      label: What works and what does not
+      description: Power on/off, volume, sources, apps, channels, state updates.
+    validations:
+      required: true
+  - type: textarea
+    id: probe
+    attributes:
+      label: Probe output (optional)
+      description: Output of `python tools/probe.py HOST` with addresses and ids removed.
+      render: text

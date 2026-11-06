@@ -1,0 +1,48 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: input
+    id: ha
+    attributes:
+      label: Home Assistant version
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Integration version
+      description: Shown on the integration page (for example 0.1.0).
+    validations:
+      required: true
+  - type: input
+    id: tv
+    attributes:
+      label: TV model and software version
+      description: Settings → Support → Device information.
+    validations:
+      required: true
+  - type: dropdown
+    id: connection
+    attributes:
+      label: How is the TV connected to the network?
+      options: [Wi-Fi, Ethernet, Not sure]
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Enable debug logging for `custom_components.hisense_vidaa`, reproduce, and paste the relevant lines. Remove addresses and ids.
+      render: text
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Download the diagnostics from the device page and attach the file.
