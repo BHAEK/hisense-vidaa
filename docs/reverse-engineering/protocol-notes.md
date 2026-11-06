@@ -249,3 +249,7 @@ from Home Assistant:
   observed. **[confirmed]**
 - Opening the TV settings menu pushes `broadcast/ui_service/actions/remote_setting`
   (empty payload). **[confirmed]**
+- `KEY_TVMUTE` and `KEY_TVUNMUTE` (present in the vendor app's key table) have no effect:
+  mute can only be toggled with `KEY_MUTE`. A volume message of type 2 (the app's mute
+  state) was never sent, not even in answer to `getvolume` while the TV was muted.
+  **[not working]**

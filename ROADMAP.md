@@ -95,6 +95,10 @@ Run together before tagging `0.1.0`:
       capability message: that value is an internal board/panel code, not the model name, so
       it is shown as the model id and the model is shown generically.
 - [ ] **(field)** F12 Pair with a PIN that starts with zero (the PIN is sent as a JSON number).
+- [x] **(field)** F17 Explicit mute: `KEY_TVMUTE` and `KEY_TVUNMUTE` do nothing on the reference
+      TV, `KEY_MUTE` is a plain toggle, and neither the key nor `getvolume` produces any
+      message about the mute state (no `volume_type` 2). Mute therefore stays an assumed
+      state; it only drifts if the TV is muted with another remote.
 - [x] **(field)** F13 Alternative standby: `KEY_SAVEPOWERS` and `KEY_SLEEPS` were sent and
       watched (screen, MQTT port, pushes): neither has any effect on the reference TV. The
       TV does not report `fake_sleep`, so `KEY_POWER` is a full standby and the only
