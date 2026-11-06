@@ -83,7 +83,8 @@ identifiers redacted is available from the device page.
   state; waking the TV through an HDMI-CEC device is a dependable alternative.
 - Presence is detected through the TV's MQTT port (36669); the TV never answers ping.
 - With audio on ARC the TV ignores absolute volume (step only) and cannot report mute, so
-  mute is tracked as an assumed state.
+  mute is tracked as an assumed state: if you mute the TV with the remote, Home Assistant
+  does not notice and its next mute request un-mutes the TV.
 - Playback keys reach HDMI devices only when the TV forwards them over CEC.
 
 Tested with Home Assistant 2026.10.

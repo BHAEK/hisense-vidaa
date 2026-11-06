@@ -80,8 +80,11 @@ Run together before tagging `0.1.0`:
 - [ ] **(field)** F5 Pairing from the Home Assistant UI with a fresh identity.
 - [ ] **(field)** F6 Reauthentication (replace the stored identity with an unknown one) and
       reconfigure (change the address).
-- [ ] **(field)** F7 Mute behaviour and absolute volume with the TV speakers selected
-      (non-ARC output).
+- [x] **(field)** F7 Mute behaviour and absolute volume with the TV speakers selected
+      (non-ARC output): the mute request sends the key only when it changes the assumed
+      state, and the volume slider appears and sets the exact level without ARC. Confirmed
+      limit: muting with the remote is not noticed, so the next mute request in Home
+      Assistant un-mutes the TV while Home Assistant reports it as muted.
 - [x] **(field)** F8 Diagnostics download reviewed: address, MAC, client identity, TV id and entry
       id are redacted; the programme title no longer is (it was over-redacted).
 - [ ] **(field)** F9 Install from the published repository and update to the next
@@ -120,6 +123,7 @@ Run together before tagging `0.1.0`:
 
 - Network wake-up is unreliable on some firmware/standby states; a CEC device waking the
   TV is a dependable workaround.
-- With audio on ARC the TV ignores absolute volume (step only) and cannot report mute.
+- With audio on ARC the TV ignores absolute volume (step only) and cannot report mute; mute
+  is therefore an assumed state and goes out of step when the TV is muted with the remote.
 - Playback keys reach the TV's HDMI-CEC devices only when the TV forwards them.
 - Verified on a single model and firmware (`V0001.01.00a.P0219`, 2018 generation).
