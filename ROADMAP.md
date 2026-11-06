@@ -68,7 +68,7 @@ Status of the work towards the first public release (`0.1.0`) and beyond.
 
 Run together before tagging `0.1.0`:
 
-- [ ] **(field)** F1 Wake-up window: turn the TV off, then wake it after 10, 20, 30, 60 and
+- [ ] **(field)** F1 (not blocking, deferred) Wake-up window: turn the TV off, then wake it after 10, 20, 30, 60 and
       120 minutes; note Wi-Fi vs Ethernet and the two network wake settings.
 - [x] **(field)** F2 Live TV from Home Assistant: channel, programme, duration and position,
       channel by number/name, media browser.
@@ -97,12 +97,9 @@ Run together before tagging `0.1.0`:
 - [ ] **(field)** F14 First CI run of hassfest, the HACS validation and the integration tests
       on GitHub is green.
 - [ ] **(field)** F15 The MAC address is learned automatically when left empty at setup.
-- [ ] **(field)** F16 Turn off and on from Home Assistant: log lines and time to come back.
-      Turn on is confirmed (wake-up packets, TV reachable 7 s later, "back online" logged);
-      turn off from Home Assistant and the wait-time variants are still to do.
-
-## Backlog (after 0.1.0)
-
+- [x] **(field)** F16 Turn off and on from Home Assistant: turn on is confirmed (wake-up
+      packets, TV reachable 7 s later, "back online" logged); turn off, the no-op while off,
+      and a wake-up after 5 minutes of standby from Home Assistant all work.
 - Options flow: hide sources/apps, custom broadcast address for wake-up.
 - SSDP discovery (needs the UPnP description of a TV that is on; match carefully, the
   reported manufacturer may be empty).
