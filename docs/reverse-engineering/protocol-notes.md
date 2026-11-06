@@ -232,3 +232,20 @@ The library should gate the feature on the capability flag.
   seen earlier. **[confirmed]**
 - `is_signal` on the source push can be 0 for a second or two after a switch while the
   input settles.
+
+## Probe results, 2026-11-06 (volume and mute)
+
+Recorded while the audio output was switched in the TV settings and the volume was moved
+from Home Assistant:
+
+- `volume_type` identifies the audio output: **1** = ARC device, **0** = the TV's own
+  speakers. Each output keeps its own level (10 on ARC and 12 on the speakers in this
+  run); switching output produces a `volumechange` push with the new type and level.
+  **[confirmed]**
+- With `volume_type` 0 the absolute volume command works: moving a slider to a level sets
+  exactly that level and the TV confirms with a `volumechange` push. With type 1 it is
+  ignored (see above). **[confirmed]**
+- Muting (by key or by remote) produces **no push of any kind**: the mute state cannot be
+  observed. **[confirmed]**
+- Opening the TV settings menu pushes `broadcast/ui_service/actions/remote_setting`
+  (empty payload). **[confirmed]**
