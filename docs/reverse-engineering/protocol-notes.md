@@ -153,8 +153,8 @@ Confirmed with `tools/probe.py` on the target TV:
   Treat these as unsupported on this firmware; current state must come from the
   connect-time broadcast and later pushes.
 - `getvolume` is answered through the `volumechange` push, not a dedicated reply.
-- `capability.devicemsg` reads `65A6101EE_0001`, which does not obviously match the
-  user-reported model name; the model must not be inferred from the user's value.
+- `capability.devicemsg` reads `65A6101EE_0001`, while the label on the TV reads `H65B7320`:
+  the field is an internal board/panel code and must not be presented as the model name.
 
 ## Probe results, 2026-11-05 (second round)
 

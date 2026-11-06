@@ -6,6 +6,10 @@ All notable changes are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The TV's internal code is shown as the model id instead of the model name.
+
 ## [0.1.0.dev2] - 2026-11-06
 
 Hardening and release preparation.

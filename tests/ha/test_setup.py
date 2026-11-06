@@ -35,7 +35,8 @@ async def test_setup_creates_the_entities_and_the_device(
         (DOMAIN, entry.entry_id), entry.entry_id
     )
     assert device is not None
-    assert device.model == "65A_TEST"
+    assert device.model == "VIDAA TV"
+    assert device.model_id == "65A_TEST"  # the TV's internal code, not its marketing name
     assert device.sw_version == "V0001.01.00a.P0219"
     assert device.serial_number == TV_ID
     assert (dr.CONNECTION_NETWORK_MAC, "aa:bb:cc:dd:ee:ff") in device.connections

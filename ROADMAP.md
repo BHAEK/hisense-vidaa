@@ -86,8 +86,9 @@ Run together before tagging `0.1.0`:
 - [ ] **(field)** F9 Install from the published repository and update to the next
       pre-release; confirm the update is offered.
 - [ ] **(field)** F10 One day with debug logging; look for connection flaps.
-- [ ] **(field)** F11 Check the model name printed on the TV label against what the TV
-      reports.
+- [x] **(field)** F11 The label reads `H65B7320` while the TV reports `65A6101EE_0001` in its
+      capability message: that value is an internal board/panel code, not the model name, so
+      it is shown as the model id and the model is shown generically.
 - [ ] **(field)** F12 Pair with a PIN that starts with zero (the PIN is sent as a JSON number).
 - [x] **(field)** F13 Alternative standby: `KEY_SAVEPOWERS` and `KEY_SLEEPS` were sent and
       watched (screen, MQTT port, pushes): neither has any effect on the reference TV. The
