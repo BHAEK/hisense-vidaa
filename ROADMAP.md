@@ -72,7 +72,7 @@ Run together before tagging `0.1.0`:
       120 minutes; note Wi-Fi vs Ethernet and the two network wake settings.
 - [x] **(field)** F2 Live TV from Home Assistant: channel, programme, duration and position,
       channel by number/name, media browser.
-- [ ] **(field)** F3 Apps: launch every listed app (including the ones with a web URL) and
+- [x] **(field)** F3 Apps: launch every listed app (including the ones with a web URL) and
       check the app selector follows.
 - [ ] **(field)** F4 Reconnect: power-cycle the TV from the remote, restart Home Assistant,
       unplug the TV; entities must recover with no reload and the log must show one
@@ -98,6 +98,8 @@ Run together before tagging `0.1.0`:
       on GitHub is green.
 - [ ] **(field)** F15 The MAC address is learned automatically when left empty at setup.
 - [ ] **(field)** F16 Turn off and on from Home Assistant: log lines and time to come back.
+      Turn on is confirmed (wake-up packets, TV reachable 7 s later, "back online" logged);
+      turn off from Home Assistant and the wait-time variants are still to do.
 
 ## Backlog (after 0.1.0)
 
