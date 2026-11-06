@@ -24,7 +24,7 @@ packages = ["src/vidaa_tv"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-testpaths = ["tests"]
+testpaths = ["tests/unit"]
 
 [tool.ruff]
 extend-exclude = ["custom_components/hisense_vidaa/vidaa_tv"]
