@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: The tag must match the project version
+        run: |
+          python tools/check_versions.py
+          version=$(python -c "import re,pathlib;print(re.search(r'__version__ = \"([^\"]+)\"', pathlib.Path('src/vidaa_tv/__version__.py').read_text()).group(1))")
+          test "${GITHUB_REF_NAME}" = "v${version}" || { echo "tag ${GITHUB_REF_NAME} does not match version ${version}"; exit 1; }
+          echo "VERSION=${version}" >> "$GITHUB_ENV"
+      - run: python tools/sync_vendor.py --check
+      - name: Build the release archive and notes
+        run: |
+          python tools/build_release.py dist/hisense_vidaa.zip
+          python tools/release_notes.py "${VERSION}" > notes.md
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=""
+          case "${VERSION}" in *dev*|*a[0-9]*|*b[0-9]*|*rc*) flags="--prerelease";; esac
+          gh release create "${GITHUB_REF_NAME}" dist/hisense_vidaa.zip \
+            --title "${GITHUB_REF_NAME}" --notes-file notes.md ${flags}
