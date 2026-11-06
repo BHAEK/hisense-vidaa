@@ -100,6 +100,9 @@ Run together before tagging `0.1.0`:
 - [x] **(field)** F16 Turn off and on from Home Assistant: turn on is confirmed (wake-up
       packets, TV reachable 7 s later, "back online" logged); turn off, the no-op while off,
       and a wake-up after 5 minutes of standby from Home Assistant all work.
+
+## Backlog (after 0.1.0)
+
 - Options flow: hide sources/apps, custom broadcast address for wake-up.
 - SSDP discovery (needs the UPnP description of a TV that is on; match carefully, the
   reported manufacturer may be empty).
