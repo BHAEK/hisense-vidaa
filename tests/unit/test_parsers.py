@@ -54,3 +54,10 @@ def test_matchers_distinguish_replies() -> None:
     assert not parsers.is_app_list(reply([{"sourcename": "TV"}]))
     assert parsers.is_source_list(reply([{"sourcename": "TV"}]))
     assert not parsers.is_source_list(reply(None))
+
+
+def test_parse_mute_only_for_type_two() -> None:
+    assert parsers.parse_mute({"volume_type": 2, "volume_value": 1}) is True
+    assert parsers.parse_mute({"volume_type": "2", "volume_value": "0"}) is False
+    assert parsers.parse_mute({"volume_type": 1, "volume_value": 10}) is None
+    assert parsers.parse_mute("garbage") is None

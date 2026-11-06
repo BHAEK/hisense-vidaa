@@ -25,6 +25,7 @@ class Snapshot:
     volume: Volume | None = None
     info: TvInfo | None = None
     auth_required: bool = False  # the TV asked for a PIN: this identity is not paired
+    muted: bool | None = None  # only known when the TV reports it (volume_type 2)
 
 
 SnapshotListener = Callable[[Snapshot], None]
@@ -61,13 +62,17 @@ class StateTracker:
                     )
                 )
             elif last == "volumechange" and parsers.is_volume(reply):
-                self._update(
-                    replace(
-                        self._snapshot,
-                        power=PowerState.ON,
-                        volume=parsers.parse_volume(reply.payload),
+                mute = parsers.parse_mute(reply.payload)
+                if mute is not None:
+                    self._update(replace(self._snapshot, power=PowerState.ON, muted=mute))
+                else:
+                    self._update(
+                        replace(
+                            self._snapshot,
+                            power=PowerState.ON,
+                            volume=parsers.parse_volume(reply.payload),
+                        )
                     )
-                )
             elif reply.topic.endswith("/ui_service/data/authentication"):
                 self._update(replace(self._snapshot, auth_required=True))
             elif last == "capability" and parsers.is_capability(reply):

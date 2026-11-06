@@ -107,3 +107,14 @@ def test_authentication_push_marks_the_identity_as_unpaired_until_reconnect() ->
     assert tracker.snapshot.auth_required
     tracker.mark_unreachable()
     assert not tracker.snapshot.auth_required
+
+
+def test_a_type_two_volume_message_is_the_mute_state_not_a_level() -> None:
+    tracker = StateTracker()
+    tracker.apply(push(VOLUME, {"volume_type": 1, "volume_value": 10}))
+    tracker.apply(push(VOLUME, {"volume_type": 2, "volume_value": 1}))
+    assert tracker.snapshot.muted is True
+    assert tracker.snapshot.volume is not None
+    assert tracker.snapshot.volume.level == 10  # untouched by the mute message
+    tracker.apply(push(VOLUME, {"volume_type": 2, "volume_value": 0}))
+    assert tracker.snapshot.muted is False

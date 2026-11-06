@@ -116,6 +116,22 @@ def _optional_str(value: Any) -> str | None:
     return None if value in (None, "") else str(value)
 
 
+MUTE_VOLUME_TYPE = 2
+
+
+def parse_mute(payload: Any) -> bool | None:
+    """The mute state carried by a volume message of type 2, or ``None`` for any other type.
+
+    The vendor app treats ``volume_type`` 2 as "mute state" (``volume_value`` 1 = muted)
+    and the other types as audio levels, so a mute message must never be read as a level.
+    """
+    if not isinstance(payload, dict) or "volume_value" not in payload:
+        return None
+    if _as_int(payload.get("volume_type", 0), "volume_type") != MUTE_VOLUME_TYPE:
+        return None
+    return _as_int(payload["volume_value"], "volume_value") == 1
+
+
 def parse_volume(payload: Any) -> Volume:
     if not isinstance(payload, dict) or "volume_value" not in payload:
         raise ProtocolError("not a volume payload")
