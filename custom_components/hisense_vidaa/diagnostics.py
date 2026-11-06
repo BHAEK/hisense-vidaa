@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from .const import CONF_DEVICE_ID, CONF_MAC
 from .runtime import VidaaConfigEntry
 
-TO_REDACT = {CONF_HOST, CONF_MAC, CONF_DEVICE_ID, "device_id", "unique_id", "title"}
+TO_REDACT = {CONF_HOST, CONF_MAC, CONF_DEVICE_ID, "device_id", "unique_id"}
 
 
 async def async_get_config_entry_diagnostics(

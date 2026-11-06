@@ -45,4 +45,4 @@ body:
     id: diagnostics
     attributes:
       label: Diagnostics
-      description: Download the diagnostics from the device page and attach the file.
+      description: Download the diagnostics from the device page and attach the file. Home Assistant also lists your other custom integrations in it; remove that part if you prefer.

@@ -35,3 +35,5 @@ async def test_diagnostics_do_not_leak_identifiers(
     assert data["connected"] is True
     assert data["snapshot"]["power"] == "on"
     assert data["catalog"]["channels"] == 2
+    assert data["entry"]["title"] == "Hisense TV"  # the neutral title is not sensitive
+    assert data["entry"]["data"]["host"] == "**REDACTED**"
