@@ -12,6 +12,8 @@ permissions: {}
 jobs:
   hacs:
     name: HACS
+    # The action only validates public repositories.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     steps:
       - uses: hacs/action@main
@@ -21,6 +23,8 @@ jobs:
   hassfest:
     name: hassfest
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: home-assistant/actions/hassfest@master
