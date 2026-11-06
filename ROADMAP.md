@@ -70,7 +70,7 @@ Run together before tagging `0.1.0`:
 
 - [ ] **(field)** F1 Wake-up window: turn the TV off, then wake it after 10, 20, 30, 60 and
       120 minutes; note Wi-Fi vs Ethernet and the two network wake settings.
-- [ ] **(field)** F2 Live TV from Home Assistant: channel, programme, duration and position,
+- [x] **(field)** F2 Live TV from Home Assistant: channel, programme, duration and position,
       channel by number/name, media browser.
 - [ ] **(field)** F3 Apps: launch every listed app (including the ones with a web URL) and
       check the app selector follows.
