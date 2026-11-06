@@ -89,10 +89,10 @@ Run together before tagging `0.1.0`:
 - [ ] **(field)** F11 Check the model name printed on the TV label against what the TV
       reports.
 - [ ] **(field)** F12 Pair with a PIN that starts with zero (the PIN is sent as a JSON number).
-- [ ] **(field)** F13 Alternative standby: send `KEY_SAVEPOWERS` and `KEY_SLEEPS` and watch the
-      screen, the MQTT port and the pushes. A mode that blanks the panel but keeps the
-      network alive would give a dependable off/on cycle (the TV does not report
-      `fake_sleep`, so `KEY_POWER` is a full standby).
+- [x] **(field)** F13 Alternative standby: `KEY_SAVEPOWERS` and `KEY_SLEEPS` were sent and
+      watched (screen, MQTT port, pushes): neither has any effect on the reference TV. The
+      TV does not report `fake_sleep`, so `KEY_POWER` is a full standby and the only
+      reliable wake-up is the network packet or an HDMI-CEC device.
 - [ ] **(field)** F14 First CI run of hassfest, the HACS validation and the integration tests
       on GitHub is green.
 - [ ] **(field)** F15 The MAC address is learned automatically when left empty at setup.
@@ -104,7 +104,6 @@ Run together before tagging `0.1.0`:
 - SSDP discovery (needs the UPnP description of a TV that is on; match carefully, the
   reported manufacturer may be empty).
 - Alternative power-on action (run a user script when network wake-up is not enough).
-- Use a power-saving key as the "off" action if F13 finds one that keeps the network alive.
 - On-screen keyboard (`input` action) and pointer (`mouse` action).
 - Rename the TV (`changetvname`), uninstall apps (`uninstallapp`).
 - Features of other firmware generations: picture settings, screenshot, programme guide,

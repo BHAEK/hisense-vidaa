@@ -178,6 +178,9 @@ Confirmed with `tools/probe.py` on the target TV:
   the TV forwards navigation keys over HDMI-CEC. **[confirmed]**
 - `KEY_INFO` on live TV produced no visible banner. Either the key is not mapped on
   this firmware or it needs a different key (e.g. `KEY_EPG`). **[not working]**
+- `KEY_SAVEPOWERS` and `KEY_SLEEPS` (defined by the vendor app but not used by its
+  interface) produce no visible effect, no push and no change of the network state on the
+  reference TV. **[not working]**
 - `launchapp` (YouTube Kids), `changesource` and the return to HDMI2 were all
   confirmed visually by the user.
 
