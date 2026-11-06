@@ -153,8 +153,9 @@ class VidaaMediaPlayer(VidaaEntity, MediaPlayerEntity):
 
     @property
     def is_volume_muted(self) -> bool:
-        # The TV cannot report mute, so this is what we last asked for.
-        return self._muted
+        reported = self._client.snapshot.muted
+        # Firmware that reports mute (volume_type 2) wins; otherwise this is what we last asked.
+        return self._muted if reported is None else reported
 
     # -- commands ------------------------------------------------------------
     @command
@@ -184,7 +185,7 @@ class VidaaMediaPlayer(VidaaEntity, MediaPlayerEntity):
     @command
     async def async_mute_volume(self, mute: bool) -> None:
         # The TV only toggles mute; send the key only when the request changes our belief.
-        if mute != self._muted:
+        if mute != self.is_volume_muted:
             await self._client.volume.mute_toggle()
             self._muted = mute
             self.async_write_ha_state()

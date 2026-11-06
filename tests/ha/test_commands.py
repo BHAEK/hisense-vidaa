@@ -193,3 +193,19 @@ async def test_selects_follow_the_tv(
     assert source.attributes["options"] == ["TV", "HDMI1", "HDMI2"]
     await call(hass, "select", "select_option", entity_id="select.hisense_tv_app", option="YouTube")
     assert any(action == "launchapp" and "YouTube" in payload for action, payload in tv.commands)
+
+
+async def test_a_reported_mute_state_wins_over_the_assumption(
+    hass: HomeAssistant, entry: MockConfigEntry, tv: FakeTv
+) -> None:
+    await setup(hass, entry)
+    await tv.push_volume(1, output_type=2)  # volume_type 2: the TV says it is muted
+    await hass.async_block_till_done()
+    player = hass.states.get(PLAYER)
+    assert player is not None
+    assert player.attributes["is_volume_muted"] is True
+    assert player.attributes["volume_level"] == 0.12  # the mute message is not a level
+    await call(hass, "media_player", "volume_mute", entity_id=PLAYER, is_volume_muted=True)
+    assert tv.keys == []  # already muted according to the TV
+    await call(hass, "media_player", "volume_mute", entity_id=PLAYER, is_volume_muted=False)
+    assert tv.keys == ["KEY_MUTE"]
