@@ -54,7 +54,12 @@ alive). Related broadcast states `fake_sleep_0` and `fake_sleep_1` exist (below)
 - Source: `sourceid, sourcename, displayname, is_signal, is_lock, hotel_mode, httpIcon`.
 - App: `appId, name, url, urlType, storeType, from, icon, hasDetailPage,
   isFavorite, isunInstalled`. Uninstall payload: `{"from","name","url"}`.
-- Volume: `{"volume_type":<int>,"volume_value":<int>}`.
+- Volume: `{"volume_type":<int>,"volume_value":<int>}`. In the app's handler `volume_type` is
+  **0** = level of the TV speakers (slider enabled), **1** = level of an amplifier/ARC device
+  (slider disabled) and **2** = the **mute state** (`volume_value` 1 = muted). The mute button
+  sends `KEY_MUTE` (a toggle); `KEY_TVMUTE` and `KEY_TVUNMUTE` exist in the key table but no
+  control of the app uses them. Whether the reference TV ever sends type 2 is **[open]**:
+  no such push was seen while muting with the key or the remote.
 - Authentication result: `{"result":<int>,"info":"<text>"}`.
 
 ## Broadcast `ui_service/state` types
