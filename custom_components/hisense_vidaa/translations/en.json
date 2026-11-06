@@ -161,10 +161,10 @@
       "message": "Error communicating with {name} during {func}: {error}"
     },
     "unknown_channel": {
-      "message": "The TV has no channel '{channel}'."
+      "message": "The TV has no channel {channel}."
     },
     "unsupported_media_type": {
-      "message": "Media type '{media_type}' is not supported."
+      "message": "Media type {media_type} is not supported."
     }
   }
 }
