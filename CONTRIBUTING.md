@@ -19,6 +19,12 @@ pip install -e ".[dev,mqtt]"
 ruff check . && ruff format --check . && mypy src && pytest
 ```
 
+- After any change under `src/vidaa_tv/`, run `python tools/sync_vendor.py`: the component
+  ships a generated copy of the library and CI fails when it is out of date.
+- Home Assistant integration tests live in `tests/ha/` and need the Home Assistant test kit
+  (Python 3.14 on Linux or macOS); they run in CI.
+- Every release needs a matching section in `CHANGELOG.md` and the same version in
+  `src/vidaa_tv/__version__.py` and the manifest (`python tools/check_versions.py`).
 - Code, comments, docs and commit messages are in English.
 - Keep commits small and focused; use conventional prefixes (`feat`, `fix`, `docs`,
   `test`, `chore`, `refactor`).

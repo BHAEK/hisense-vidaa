@@ -18,48 +18,51 @@ Status of the work towards the first public release (`0.1.0`) and beyond.
 
 ### 1. Reliability
 
-- [ ] The connection supervisor never dies on an unexpected error; failures are logged.
-- [ ] Transport errors on subscribe and on the message stream end the session and trigger a
+- [x] The connection supervisor never dies on an unexpected error; failures are logged.
+- [x] Transport errors on subscribe and on the message stream end the session and trigger a
       reconnect instead of leaving stale state.
-- [ ] Background tasks are owned by the config entry and stop cleanly on unload/shutdown.
-- [ ] The MQTT transport is covered by automated tests (fake broker client).
-- [ ] Availability transitions are logged once ("unavailable" / "back online").
+- [x] Background tasks are owned by the config entry and stop cleanly on unload/shutdown.
+- [x] The MQTT transport is covered by automated tests (fake broker client).
+- [x] Availability transitions are logged once ("unavailable" / "back online").
 
 ### 2. Behaviour fixes
 
-- [ ] Mute is an assumed state: a request only sends the key when it changes the state.
-- [ ] Turn off is a no-op unless the TV is on.
-- [ ] Turn on sends the wake-up and returns; a background check logs if the TV stays away.
-- [ ] Media position is refreshed only when the TV pushes a change.
-- [ ] The device registry is updated only when the identity information changes.
-- [ ] Neutral default title (no IP address); every user-visible string is translated.
-- [ ] Current Home Assistant APIs (`AddConfigEntryEntitiesCallback`), runtime data types in
+- [x] Mute is an assumed state: a request only sends the key when it changes the state.
+- [x] Turn off is a no-op unless the TV is on.
+- [x] Turn on sends the wake-up and returns; a background check logs if the TV stays away.
+- [x] Media position is refreshed only when the TV pushes a change.
+- [x] The device registry is updated only when the identity information changes.
+- [x] Neutral default title (no IP address); entity names and errors are translated (media
+      browser folder titles stay in English).
+- [x] Current Home Assistant APIs (`AddConfigEntryEntitiesCallback`), runtime data types in
       their own module, `loggers` declared in the manifest.
 
 ### 3. Install and update path
 
-- [ ] The library uses relative imports, so the same source runs standalone and vendored.
-- [ ] A vendored copy lives in `custom_components/hisense_vidaa/vidaa_tv/`, produced by
+- [x] The library uses relative imports, so the same source runs standalone and vendored.
+- [x] A vendored copy lives in `custom_components/hisense_vidaa/vidaa_tv/`, produced by
       `tools/sync_vendor.py` and verified in CI.
-- [ ] Manifest requires only a pinned `aiomqtt`; no dependency on an unpublished package.
-- [ ] Single version source with a consistency check.
-- [ ] `CHANGELOG.md`, `hacs.json`, `brand/` assets, repository description and topics.
-- [ ] Release workflow: tag → checks → `hisense_vidaa.zip` → GitHub release.
-- [ ] `SECURITY.md`, issue and pull request templates, Dependabot.
-- [ ] README: installation (store, custom repository, manual) and how updates arrive.
+- [x] Manifest requires only a pinned `aiomqtt`; no dependency on an unpublished package.
+- [x] Single version source with a consistency check.
+- [x] `CHANGELOG.md`, `hacs.json`, `brand/` assets.
+- [ ] Repository description and topics on GitHub.
+- [ ] Release workflow: tag → checks → `hisense_vidaa.zip` → GitHub release (written; needs
+      its first tag to be proven).
+- [x] `SECURITY.md`, issue and pull request templates, Dependabot.
+- [x] README: installation (store, custom repository, manual) and how updates arrive.
 
 ### 4. Configuration
 
-- [ ] Stable config entry id taken from the TV itself (survives IP changes).
-- [ ] Reconfigure flow (new address).
-- [ ] Reauthentication flow when the TV forgets the paired identity.
+- [x] Stable config entry id taken from the TV itself (survives IP changes).
+- [x] Reconfigure flow (new address).
+- [x] Reauthentication flow when the TV forgets the paired identity.
 
 ### 5. CI and tests
 
-- [ ] `hassfest` and the HACS validation run on every push.
-- [ ] Adapter tests on the Home Assistant test harness (Python 3.14): config flow, setup,
+- [ ] `hassfest` and the HACS validation run on every push (written; needs its first run).
+- [x] Adapter tests on the Home Assistant test harness (Python 3.14): config flow, setup,
       entities, diagnostics.
-- [ ] Coverage reported; library gate at 85 %.
+- [x] Coverage reported; library gate at 85 %.
 
 ### 6. Field validation (needs the TV)
 
@@ -85,6 +88,15 @@ Run together before tagging `0.1.0`:
 - [ ] **(field)** F10 One day with debug logging; look for connection flaps.
 - [ ] **(field)** F11 Check the model name printed on the TV label against what the TV
       reports.
+- [ ] **(field)** F12 Pair with a PIN that starts with zero (the PIN is sent as a JSON number).
+- [ ] **(field)** F13 Alternative standby: send `KEY_SAVEPOWERS` and `KEY_SLEEPS` and watch the
+      screen, the MQTT port and the pushes. A mode that blanks the panel but keeps the
+      network alive would give a dependable off/on cycle (the TV does not report
+      `fake_sleep`, so `KEY_POWER` is a full standby).
+- [ ] **(field)** F14 First CI run of hassfest, the HACS validation and the integration tests
+      on GitHub is green.
+- [ ] **(field)** F15 The MAC address is learned automatically when left empty at setup.
+- [ ] **(field)** F16 Turn off and on from Home Assistant: log lines and time to come back.
 
 ## Backlog (after 0.1.0)
 
@@ -92,6 +104,7 @@ Run together before tagging `0.1.0`:
 - SSDP discovery (needs the UPnP description of a TV that is on; match carefully, the
   reported manufacturer may be empty).
 - Alternative power-on action (run a user script when network wake-up is not enough).
+- Use a power-saving key as the "off" action if F13 finds one that keeps the network alive.
 - On-screen keyboard (`input` action) and pointer (`mouse` action).
 - Rename the TV (`changetvname`), uninstall apps (`uninstallapp`).
 - Features of other firmware generations: picture settings, screenshot, programme guide,

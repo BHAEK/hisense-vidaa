@@ -1,5 +1,8 @@
 # hisense-vidaa
 
+[![CI](https://github.com/BHAEK/hisense-vidaa/actions/workflows/ci.yml/badge.svg)](https://github.com/BHAEK/hisense-vidaa/actions/workflows/ci.yml)
+[![Validate](https://github.com/BHAEK/hisense-vidaa/actions/workflows/validate.yml/badge.svg)](https://github.com/BHAEK/hisense-vidaa/actions/workflows/validate.yml)
+
 Async Python library and Home Assistant integration for Hisense TVs running
 **VIDAA OS**, including older firmware generations.
 
@@ -7,24 +10,83 @@ The protocol is reverse engineered from the vendor remote app and verified on re
 hardware. Every feature listed below was exercised on a TV running software
 `V0001.01.00a.P0219` (board MSD6886, 2018 generation).
 
-> Status: early development (`0.1.0`). Independent community project, not affiliated
-> with or endorsed by Hisense or VIDAA.
+> Status: pre-release (`0.1.0.devN`). Independent community project, not affiliated with or
+> endorsed by Hisense or VIDAA. See the [roadmap](ROADMAP.md) and the
+> [changelog](CHANGELOG.md).
 
 ## What works
 
 | Area | Features |
 | --- | --- |
-| Pairing | PIN pairing of a new client identity; known identities reconnect silently |
+| Pairing | PIN pairing of a new client identity; paired identities reconnect silently |
 | Power | Turn off; turn on over the network (Wake-on-LAN and the VIDAA wake packet) |
 | State (push) | Power, source, live channel and current programme, running app, volume |
 | Remote | Every key of the vendor remote (180+ key names), including navigation forwarded to HDMI-CEC devices |
-| Volume | Step up/down, mute toggle (the TV cannot report mute or set absolute volume over ARC) |
+| Volume | Step up/down, mute toggle; absolute volume when the audio is not on ARC |
 | Sources | List and switch (TV, AV, HDMI) |
 | Apps | List and launch installed apps |
 | Channels | Channel lists, tuning by number or name |
 
 Not available on this firmware (verified, see `docs/reverse-engineering/`): remote
 picture settings, screenshots, programme guide data, recordings.
+
+## Home Assistant
+
+### Install
+
+**Through the store** (HACS or the built-in marketplace, depending on your Home Assistant
+version): add `https://github.com/BHAEK/hisense-vidaa` as a custom repository of type
+*Integration*, install **Hisense VIDAA** and restart Home Assistant.
+
+**Manually**: download `hisense_vidaa.zip` from the
+[latest release](https://github.com/BHAEK/hisense-vidaa/releases), unzip it into
+`<config>/custom_components/hisense_vidaa/` and restart Home Assistant.
+
+### Set up
+
+*Settings → Devices & services → Add integration → Hisense VIDAA.*
+
+1. Turn the TV on and enter its IP address.
+2. Type the PIN shown on the TV screen (you have about a minute).
+3. The MAC address is optional: once the TV is connected it is read from the network
+   neighbour table (same network segment required) and stored. It is needed to turn the TV
+   on from standby.
+
+If the TV forgets Home Assistant, a *re-authentication* notice asks for a new PIN; if the TV
+gets a new address, use *Reconfigure* on the integration entry.
+
+### Update
+
+Updates arrive through the store when a new release is published (pre-releases are shown
+only if you enable them). Manual installs: replace the folder with the one from the new
+release and restart. The component carries its own copy of the library, so there is
+nothing else to install except `aiomqtt`, which Home Assistant installs by itself.
+
+### Entities
+
+| Platform | Entities |
+| --- | --- |
+| `media_player` | power, volume (step; absolute when audio is not on ARC), mute, play/pause/stop keys, source and app selection, channel by number/name, programme duration and position, media browser (channels and apps) |
+| `remote` | send any key, with repeats |
+| `sensor` | source, channel, programme, programme end, volume |
+| `select` | input source, app |
+| `button` | common remote keys |
+| `binary_sensor` | connection status (diagnostic) |
+
+Commands sent while the TV is off fail with a clear message. A diagnostics download with
+identifiers redacted is available from the device page.
+
+### TV settings and known limits
+
+- Enable **Wake on LAN** (and the wireless wake option when the TV is on Wi-Fi) in the TV
+  network settings. Network wake-up can still be unreliable depending on the TV's standby
+  state; waking the TV through an HDMI-CEC device is a dependable alternative.
+- Presence is detected through the TV's MQTT port (36669); the TV never answers ping.
+- With audio on ARC the TV ignores absolute volume (step only) and cannot report mute, so
+  mute is tracked as an assumed state.
+- Playback keys reach HDMI devices only when the TV forwards them over CEC.
+
+Tested with Home Assistant 2026.10.
 
 ## Library
 
@@ -64,53 +126,18 @@ await flow.close()
 print(flow.device_id)  # keep it: this is the identity the TV now trusts
 ```
 
-## Home Assistant
-
-The `custom_components/hisense_vidaa` folder is a thin adapter over the library.
-
-| Platform | Entities |
-| --- | --- |
-| `media_player` | power, volume (step; absolute when audio is not on ARC), mute, play/pause/stop keys, source and app selection, channel by number/name, programme duration and position, media browser (channels and apps) |
-| `remote` | send any key, with repeats |
-| `sensor` | source, channel, programme, programme end, volume |
-| `select` | input source, app |
-| `button` | common remote keys |
-| `binary_sensor` | connection status (diagnostic) |
-
-Home Assistant keeps its configuration folder off the import path, so for manual
-installs build a self-contained copy of the component:
-
-```bash
-python tools/build_ha_bundle.py        # writes dist/hisense_vidaa_ha_test.zip
-```
-
-Unzip it into the Home Assistant configuration directory (it only adds
-`custom_components/hisense_vidaa`), restart, then add **Hisense VIDAA** from
-*Settings → Devices & services* with the TV's address and, optionally, its MAC.
-Keep the TV on and watch for the PIN. The MAC address may be left empty: it is read from
-the host's neighbour table once the TV is connected (same network segment required) and
-stored. Commands sent while the TV is off fail with a clear message, and a diagnostics
-download with identifiers redacted is available from the device page.
-
-## Requirements and TV settings
-
-- Python 3.11+ for the library; the `mqtt` extra installs `aiomqtt`.
-- The TV must be on the same network. Presence is detected through its MQTT port
-  (36669); the TV never answers ping.
-- To wake the TV, enable **Wake on LAN** (and the wireless wake option on Wi-Fi) in
-  the TV network settings, and supply the TV's MAC address.
-- On Windows, `aiomqtt` needs the selector event loop
-  (`asyncio.run(main(), loop_factory=asyncio.SelectorEventLoop)`).
+Python 3.11+; the `mqtt` extra installs `aiomqtt`. On Windows, `aiomqtt` needs the selector
+event loop (`asyncio.run(main(), loop_factory=asyncio.SelectorEventLoop)`).
 
 ## Repository layout
 
 | Path | Purpose |
 | --- | --- |
-| `src/vidaa_tv/` | Client library |
-| `custom_components/hisense_vidaa/` | Home Assistant adapter |
+| `src/vidaa_tv/` | Client library (single source of truth) |
+| `custom_components/hisense_vidaa/` | Home Assistant adapter; `vidaa_tv/` inside it is a generated copy of the library |
 | `docs/` | Architecture and reverse-engineering notes |
-| `tools/` | Diagnostic probe and bundle builder |
-| `tests/` | Unit tests |
+| `tools/` | Diagnostic probe, vendoring, release and brand helpers |
+| `tests/unit/`, `tests/ha/` | Library tests and Home Assistant integration tests |
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the layering and
 [`docs/reverse-engineering/`](docs/reverse-engineering/) for the protocol notes.
@@ -120,18 +147,21 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the layering and
 ```bash
 python -m venv .venv
 pip install -e ".[dev,mqtt]"
-pytest
-ruff check .
-mypy src
+python tools/sync_vendor.py     # after any change under src/vidaa_tv
+pytest && ruff check . && mypy src
 ```
+
+The Home Assistant integration tests need the Home Assistant test kit (Python 3.14, Linux or
+macOS) and run in CI: `pip install pytest-homeassistant-custom-component` then
+`pytest tests/ha`.
 
 Contributions are welcome; see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-## Diagnostics
+## Diagnostics for other firmware
 
-`tools/probe.py HOST` pairs (if needed) and records how a TV answers each query, so
-other firmware generations can be documented. Captures go to a git-ignored folder and
-should be redacted before being shared: they contain the TV's device id.
+`tools/probe.py HOST` pairs (if needed) and records how a TV answers each query, so other
+firmware generations can be documented. Captures go to a git-ignored folder and should be
+redacted before being shared: they contain the TV's device id.
 
 ## License
 
