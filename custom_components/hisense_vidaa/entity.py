@@ -66,7 +66,6 @@ class VidaaEntity(Entity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             manufacturer="Hisense",
-            model="VIDAA",
             name=entry.title,
         )
 

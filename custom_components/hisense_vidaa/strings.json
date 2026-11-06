@@ -15,14 +15,31 @@
         "data": {
           "pin": "PIN"
         }
+      },
+      "reauth_confirm": {
+        "title": "Pair again",
+        "description": "The TV no longer recognises Home Assistant. Turn it on and continue: a new PIN will appear on the screen."
+      },
+      "reconfigure": {
+        "title": "Reconfigure the TV",
+        "description": "Enter the new address of the TV.",
+        "data": {
+          "host": "Host",
+          "mac": "TV MAC address (needed to turn it on)"
+        }
       }
     },
     "error": {
       "cannot_connect": "Could not reach the TV. Make sure it is on.",
-      "invalid_pin": "The PIN was rejected. Try again."
+      "invalid_pin": "The PIN was rejected. Try again.",
+      "not_paired": "The TV does not know this installation. Use the re-authentication instead.",
+      "wrong_device": "That address belongs to a different TV."
     },
     "abort": {
-      "already_configured": "This TV is already configured."
+      "already_configured": "This TV is already configured.",
+      "reauth_successful": "The TV is paired again.",
+      "reconfigure_successful": "The TV address was updated.",
+      "wrong_device": "This is a different TV from the one configured."
     }
   },
   "entity": {

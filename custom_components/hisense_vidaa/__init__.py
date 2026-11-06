@@ -48,6 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: VidaaConfigEntry) -> boo
     entry.runtime_data = VidaaData(client, catalog)
 
     resolving_mac = False
+    reauth_started = False
     published_identity: tuple[Any, ...] | None = None
 
     async def resolve_mac() -> None:
@@ -70,6 +71,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: VidaaConfigEntry) -> boo
         if identity == published_identity:
             return
         published_identity = identity
+        if info.device_id and entry.unique_id != info.device_id:
+            hass.config_entries.async_update_entry(entry, unique_id=info.device_id)
         connections = (
             {(dr.CONNECTION_NETWORK_MAC, dr.format_mac(client.mac))} if client.mac else set()
         )
@@ -85,7 +88,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: VidaaConfigEntry) -> boo
         )
 
     def on_snapshot(snapshot: Snapshot) -> None:
-        nonlocal resolving_mac
+        nonlocal resolving_mac, reauth_started
+        if snapshot.auth_required and not reauth_started:
+            reauth_started = True
+            _LOGGER.warning("The TV no longer recognises this client; asking to pair again")
+            entry.async_start_reauth(hass)
         if snapshot.power is PowerState.ON and not catalog.loaded:
             spawn("catalog", catalog.refresh())
         elif snapshot.power in (PowerState.OFF, PowerState.STANDBY):
