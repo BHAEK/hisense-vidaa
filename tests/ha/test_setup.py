@@ -77,6 +77,7 @@ async def test_the_tv_going_off_and_coming_back(
     assert await runtime.client.wait_connected(2)
     await hass.async_block_till_done()
     assert hass.states.get("media_player.hisense_tv").state == "on"  # type: ignore[union-attr]
+    assert hass.states.get("binary_sensor.hisense_tv_connection").state == "on"  # type: ignore[union-attr]
 
 
 async def test_unload_stops_the_client(

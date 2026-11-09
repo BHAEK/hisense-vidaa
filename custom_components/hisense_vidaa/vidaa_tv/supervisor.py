@@ -103,6 +103,8 @@ class Supervisor:
     def _mark_available(self) -> None:
         if self._available is False:
             _LOGGER.info("%s is back online", self._name)
+        elif self._available is None:
+            _LOGGER.info("%s is connected", self._name)
         self._available = True
 
     def _mark_unavailable(self) -> None:

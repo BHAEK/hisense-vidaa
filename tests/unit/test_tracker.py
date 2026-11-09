@@ -118,3 +118,23 @@ def test_a_type_two_volume_message_is_the_mute_state_not_a_level() -> None:
     assert tracker.snapshot.volume.level == 10  # untouched by the mute message
     tracker.apply(push(VOLUME, {"volume_type": 2, "volume_value": 0}))
     assert tracker.snapshot.muted is False
+
+
+def test_connection_flag_follows_the_session_and_a_connected_tv_is_on() -> None:
+    tracker = StateTracker()
+    assert not tracker.snapshot.connected
+    tracker.mark_connected()
+    assert tracker.snapshot.connected
+    assert tracker.snapshot.power is PowerState.ON
+    tracker.mark_unreachable()
+    assert not tracker.snapshot.connected
+    assert tracker.snapshot.power is PowerState.OFF
+
+
+def test_a_standby_announcement_is_not_overwritten_by_the_connection_flag() -> None:
+    tracker = StateTracker()
+    tracker.mark_connected()
+    tracker.apply(push(SLEEP, None))
+    assert tracker.snapshot.power is PowerState.STANDBY
+    tracker.mark_connected()
+    assert tracker.snapshot.power is PowerState.STANDBY

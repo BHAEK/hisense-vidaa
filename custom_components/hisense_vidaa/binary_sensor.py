@@ -31,4 +31,4 @@ class VidaaConnectionSensor(VidaaEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool:
-        return self._client.connected
+        return self._client.snapshot.connected

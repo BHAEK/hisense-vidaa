@@ -59,6 +59,7 @@ async def test_connection_drop_marks_off_then_recovers() -> None:
     await client.start()
     assert await client.wait_connected(1)
     await transport.deliver(STATE, b'{"statetype":"livetv"}')
+    transport.reachable = False  # the TV is really gone, so the reconnect attempt fails
     transport.drop()
     await settle()
     assert client.snapshot.power is PowerState.OFF
@@ -151,3 +152,21 @@ async def test_wake_sends_packets_and_returns_without_waiting(
     )
     await client.wake()
     assert sent == [("11:22:33:44:55:66", ("255.255.255.255", "192.0.2.255"))]
+
+
+async def test_the_snapshot_says_connected_as_soon_as_the_session_is_up(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.INFO, logger="vidaa_tv.supervisor")
+    transport = FakeTransport()
+    client = make(transport)
+    await client.start()
+    assert await client.wait_connected(1)
+    assert client.snapshot.connected
+    assert client.snapshot.power is PowerState.ON  # before any state push arrived
+    assert [r.getMessage() for r in caplog.records] == ["tv.local is connected"]
+    transport.reachable = False
+    transport.drop()
+    await settle()
+    assert not client.snapshot.connected
+    await client.stop()

@@ -160,3 +160,4 @@ class VidaaClient:
         await self._session.send(Action.GET_TV_STATE)
         await self._session.send(Action.GET_VOLUME)
         await self._session.send(Action.CAPABILITY)
+        self._tracker.mark_connected()

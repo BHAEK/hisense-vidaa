@@ -26,6 +26,7 @@ class Snapshot:
     info: TvInfo | None = None
     auth_required: bool = False  # the TV asked for a PIN: this identity is not paired
     muted: bool | None = None  # only known when the TV reports it (volume_type 2)
+    connected: bool = False  # the session with the TV is up
 
 
 SnapshotListener = Callable[[Snapshot], None]
@@ -47,7 +48,16 @@ class StateTracker:
 
     def mark_unreachable(self) -> None:
         """Record that the TV cannot be reached (it is off or unplugged)."""
-        self._update(replace(self._snapshot, power=PowerState.OFF, auth_required=False))
+        self._update(
+            replace(self._snapshot, power=PowerState.OFF, auth_required=False, connected=False)
+        )
+
+    def mark_connected(self) -> None:
+        """Record that the session is up; a TV that accepts a connection is on."""
+        power = self._snapshot.power
+        if power in (PowerState.OFF, PowerState.UNKNOWN):
+            power = PowerState.ON
+        self._update(replace(self._snapshot, power=power, connected=True))
 
     def apply(self, reply: Reply) -> None:
         """Fold one incoming message into the snapshot."""
