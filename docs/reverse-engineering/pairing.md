@@ -17,13 +17,28 @@ A client identity is `<MAC>$vidaa_common`; the MAC identifies the *client*
    (all under `/remoteapp/tv/ui_service/<client>/actions/`).
 5. The TV shows a PIN. Some identities also trigger `authenticationcodetoast`
    and `authenticationcodeclose` pushes.
-6. Publish `authenticationcode` with `{"authNum":<digits>}` (a JSON number).
+6. Publish `authenticationcode` with `{"authNum":"<digits>"}` (a JSON **string**, see below).
 7. The reply on `<client>/ui_service/data/authenticationcode` is
    `{"result":1,"info":""}` on success.
 8. Optionally publish `authenticationcodeclose` (empty).
 
 No token is issued on this firmware. `tokenissuance` never arrives and the
 identity is simply remembered by the TV.
+
+## PIN format  **[confirmed]**
+
+The vendor app builds the payload by concatenating its four digit fields into a string
+(`authNum` is a string). Sending the PIN as a JSON **number** works for PINs without a
+leading zero but **fails for a PIN such as `0123`** (observed on the reference TV: the PIN
+shown on the screen was rejected). The library now sends the string form.
+
+Probe with a deliberately wrong PIN on the reference TV: both `{"authNum":0000}` (number) and
+`{"authNum":"0000"}` (string) are parsed and answered with
+`{"result":100,"info":"Wrong authNum!!"}`, so the TV accepts both syntaxes. The likely reason
+for the failure of a number such as `0123` is that the TV reads it as `123` and compares the
+text with the PIN `0123`; the string form delivers the digits unchanged. A normal PIN is
+accepted in the string form (`8114`). A genuine PIN with a leading zero has not been
+confirmed on the TV with the string form yet. **[open]**
 
 ## Reconnecting with a known identity  **[confirmed]**
 

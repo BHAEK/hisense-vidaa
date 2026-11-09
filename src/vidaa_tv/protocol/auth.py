@@ -5,7 +5,9 @@ Two schemes exist in the field:
 * ``static`` - fixed credentials, used by older firmware (this project's primary
   target).
 * ``dynamic`` - time-based credentials derived from the device id, used by
-  newer firmware.
+  newer firmware. **Untested against a real TV**: it follows third-party analysis of the
+  vendor app and is only checked against a published example vector (see
+  docs/compatibility.md).
 """
 
 from __future__ import annotations
