@@ -83,6 +83,7 @@ The honest list of what is **not** verified (newer firmware needing different cr
 import asyncio
 from vidaa_tv import VidaaClient, RemoteKey, mqtt_transport_factory
 
+
 async def main() -> None:
     tv = VidaaClient(
         "192.168.1.50",
@@ -99,6 +100,7 @@ async def main() -> None:
     await tv.apps.launch("YouTube")
     await tv.turn_off()
     await tv.stop()
+
 
 asyncio.run(main())
 ```
