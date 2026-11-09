@@ -15,5 +15,5 @@
   "requirements": [
     "aiomqtt==2.5.1"
   ],
-  "version": "0.1.0.dev2"
+  "version": "0.1.0rc1"
 }

@@ -5,6 +5,8 @@ Status of the work towards the first public release (`0.1.0`) and beyond.
 
 ## Release policy
 
+Current step: `0.1.0rc1` is being published; `0.1.0` follows once F9, F10 and F12 are green.
+
 - [Semantic Versioning](https://semver.org). One version number covers the library and the
   Home Assistant component, because the component ships a vendored copy of the library.
 - Pre-releases use `0.1.0.devN` (work in progress) and `0.1.0rcN` (feature complete, in
@@ -59,7 +61,8 @@ Status of the work towards the first public release (`0.1.0`) and beyond.
 
 ### 5. CI and tests
 
-- [ ] `hassfest` and the HACS validation run on every push (written; needs its first run).
+- [ ] `hassfest` and the HACS validation run on every push (hassfest verified and green; the
+      HACS check is skipped while the repository is private and runs once it is public).
 - [x] Adapter tests on the Home Assistant test harness (Python 3.14): config flow, setup,
       entities, diagnostics.
 - [x] Coverage reported; library gate at 85 %.
@@ -74,12 +77,14 @@ Run together before tagging `0.1.0`:
       channel by number/name, media browser.
 - [x] **(field)** F3 Apps: launch every listed app (including the ones with a web URL) and
       check the app selector follows.
-- [ ] **(field)** F4 Reconnect: power-cycle the TV from the remote, restart Home Assistant,
+- [x] **(field)** F4 Reconnect: power-cycle the TV from the remote, restart Home Assistant,
       unplug the TV; entities must recover with no reload and the log must show one
       "unavailable" and one "back online" line.
-- [ ] **(field)** F5 Pairing from the Home Assistant UI with a fresh identity.
-- [ ] **(field)** F6 Reauthentication (replace the stored identity with an unknown one) and
-      reconfigure (change the address).
+- [x] **(field)** F5 Pairing from the Home Assistant UI with a fresh identity (new entry,
+      stable id from the TV, entities created, entity settings restored afterwards).
+- [x] **(field)** F6 Reconfigure (change the address, wrong address refused, right address
+      accepted) works from the interface. Re-authentication is covered by automated tests only
+      and is listed as untested in `docs/compatibility.md`.
 - [x] **(field)** F7 Mute behaviour and absolute volume with the TV speakers selected
       (non-ARC output): the mute request sends the key only when it changes the assumed
       state, and the volume slider appears and sets the exact level without ARC. Confirmed
@@ -94,7 +99,10 @@ Run together before tagging `0.1.0`:
 - [x] **(field)** F11 The label reads `H65B7320` while the TV reports `65A6101EE_0001` in its
       capability message: that value is an internal board/panel code, not the model name, so
       it is shown as the model id and the model is shown generically.
-- [ ] **(field)** F12 Pair with a PIN that starts with zero (the PIN is sent as a JSON number).
+- [ ] **(field)** F12 PIN starting with zero: sent as a JSON number it was rejected by the TV
+      (confirmed); the PIN is now sent as a string like the vendor app does. Still to verify
+      on the TV: a normal PIN with the string form, and a PIN with a leading zero when one
+      turns up.
 - [x] **(field)** F17 Explicit mute: `KEY_TVMUTE` and `KEY_TVUNMUTE` do nothing on the reference
       TV, `KEY_MUTE` is a plain toggle, and neither the key nor `getvolume` produces any
       message about the mute state (no `volume_type` 2). Mute therefore stays an assumed
@@ -104,8 +112,8 @@ Run together before tagging `0.1.0`:
       TV does not report `fake_sleep`, so `KEY_POWER` is a full standby and the only
       reliable wake-up is the network packet or an HDMI-CEC device.
 - [ ] **(field)** F14 First CI run of hassfest, the HACS validation and the integration tests
-      on GitHub is green.
-- [ ] **(field)** F15 The MAC address is learned automatically when left empty at setup.
+      on GitHub is green (hassfest and the tests are; the HACS check waits for a public repo).
+- [x] **(field)** F15 The MAC address is learned automatically when left empty at setup.
 - [x] **(field)** F16 Turn off and on from Home Assistant: turn on is confirmed (wake-up
       packets, TV reachable 7 s later, "back online" logged); turn off, the no-op while off,
       and a wake-up after 5 minutes of standby from Home Assistant all work.

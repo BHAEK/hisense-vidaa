@@ -6,9 +6,32 @@ All notable changes are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0rc1] - 2026-11-09
+
+Release candidate: every feature was exercised on a real TV (see `docs/compatibility.md` for
+what was and was not). Only a PIN starting with zero, installation through the store and a
+full day of logs are still to be confirmed.
+
+### Added
+
+- The configuration flow logs what it does (pairing started, PIN shown, rejected or accepted).
+
+- `docs/compatibility.md`: what has been verified on real hardware and what has not.
+- The connection state is part of the snapshot, so the connection sensor follows the session
+  at once; a TV that accepts a connection is reported as on without waiting for a push.
+- The first connection is logged once ("is connected").
+
+### Fixed
+
+- A PIN starting with zero was rejected: it is now sent as a string, as the vendor app does,
+  instead of a JSON number.
+
 ### Changed
 
 - The TV's internal code is shown as the model id instead of the model name.
+- A volume message of type 2 is read as the mute state, never as a level; when the TV reports
+  it, Home Assistant uses it instead of the assumed state.
+- Diagnostics keep the programme title visible.
 
 ## [0.1.0.dev2] - 2026-11-06
 
