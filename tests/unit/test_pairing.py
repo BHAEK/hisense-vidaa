@@ -41,7 +41,7 @@ async def test_pin_accepted_sends_number_then_close() -> None:
     await asyncio.sleep(0.01)
     await transport.deliver(f"{BASE}/authenticationcode", b'{"result":1,"info":""}')
     await task
-    assert transport.published[0].payload == b'{"authNum":1234}'
+    assert transport.published[0].payload == b'{"authNum":"1234"}'
     assert transport.published[1].topic.endswith("/actions/authenticationcodeclose")
 
 
@@ -103,3 +103,12 @@ async def test_pairing_flow_info_is_none_when_the_tv_stays_silent() -> None:
 
     flow = PairingFlow("tv", lambda host, creds: FakeTransport(), timeout=0.05)
     assert await flow.fetch_info() is None
+
+
+async def test_a_pin_with_a_leading_zero_keeps_it() -> None:
+    transport, pairing = make()
+    task = asyncio.create_task(pairing.submit_pin("0123"))
+    await asyncio.sleep(0.01)
+    await transport.deliver(f"{BASE}/authenticationcode", b'{"result":1,"info":""}')
+    await task
+    assert transport.published[0].payload == b'{"authNum":"0123"}'

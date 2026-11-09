@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 from typing import Any
 
 from custom_components.hisense_vidaa.vidaa_tv.errors import ConnectionFailedError
@@ -63,6 +62,7 @@ class FakeTv:
         self, *, paired_ids: set[str] | None = None, state: dict[str, Any] | None = None
     ) -> None:
         self.online = True
+        self.pin = PIN
         self.paired_ids: set[str] = paired_ids if paired_ids is not None else set()
         self.accept_any_identity = False
         self.state = state or HDMI_STATE
@@ -140,8 +140,8 @@ class FakeTv:
             else:
                 await self._deliver(f"{base}/ui_service/data/capability", CAPABILITY)
         elif action == "authenticationcode":
-            digits = re.search(r"\d+", payload)
-            ok = digits is not None and digits.group() == PIN
+            sent = json.loads(payload).get("authNum")
+            ok = isinstance(sent, str) and sent == self.pin  # the real TV needs the string form
             if ok:
                 self.paired_ids.add(client.split("$")[0])
             await self._deliver(

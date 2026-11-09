@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import logging
+
+import pytest
 from custom_components.hisense_vidaa.const import CONF_DEVICE_ID, CONF_MAC, DOMAIN
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST
@@ -124,3 +127,27 @@ async def test_reconfigure_needs_a_paired_identity(
     )
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "not_paired"}
+
+
+async def test_a_pin_starting_with_zero_is_accepted(hass: HomeAssistant, tv: FakeTv) -> None:
+    tv.paired_ids.clear()
+    tv.pin = "0123"
+    result = await start_user_flow(hass)
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"pin": "0123"})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+
+
+async def test_the_flow_logs_what_happens(
+    hass: HomeAssistant, tv: FakeTv, caplog: pytest.LogCaptureFixture
+) -> None:
+    caplog.set_level(logging.INFO, logger="custom_components.hisense_vidaa.config_flow")
+    tv.paired_ids.clear()
+    result = await start_user_flow(hass)
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"pin": "0000"})
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {"pin": PIN})
+    messages = [record.getMessage() for record in caplog.records]
+    assert any("Starting to pair" in m for m in messages)
+    assert any("showing a PIN" in m for m in messages)
+    assert any("rejected the PIN" in m for m in messages)
+    assert any("accepted the PIN" in m for m in messages)
+    assert any("Pairing finished" in m for m in messages)

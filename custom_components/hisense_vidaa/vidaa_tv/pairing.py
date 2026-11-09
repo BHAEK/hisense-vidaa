@@ -73,7 +73,9 @@ class Pairing:
             raise AuthenticationError("the PIN must contain digits")
         await self._session.open()
         result = self._session.watch(_is_auth_result)
-        await self._session.send(Action.AUTHENTICATION_CODE, f'{{"authNum":{digits}}}')
+        # The vendor app sends the PIN as a string (it concatenates the four digit fields);
+        # a JSON number cannot carry a leading zero.
+        await self._session.send(Action.AUTHENTICATION_CODE, {"authNum": digits})
         reply = await self._session.wait(result, "PIN verdict")
         if reply.payload.get("result") != 1:
             raise AuthenticationError(f"PIN rejected: {reply.payload}")
