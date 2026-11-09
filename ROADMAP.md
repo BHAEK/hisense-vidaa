@@ -47,9 +47,9 @@ Current step: `0.1.0rc1` is being published; `0.1.0` follows once F9, F10 and F1
 - [x] Manifest requires only a pinned `aiomqtt`; no dependency on an unpublished package.
 - [x] Single version source with a consistency check.
 - [x] `CHANGELOG.md`, `hacs.json`, `brand/` assets.
-- [ ] Repository description and topics on GitHub.
-- [ ] Release workflow: tag → checks → `hisense_vidaa.zip` → GitHub release (written; needs
-      its first tag to be proven).
+- [x] Repository description and topics on GitHub.
+- [x] Release workflow: tag → checks → `hisense_vidaa.zip` → GitHub release (proven by the
+      `v0.1.0rc1` tag).
 - [x] `SECURITY.md`, issue and pull request templates, Dependabot.
 - [x] README: installation (store, custom repository, manual) and how updates arrive.
 
@@ -61,8 +61,7 @@ Current step: `0.1.0rc1` is being published; `0.1.0` follows once F9, F10 and F1
 
 ### 5. CI and tests
 
-- [ ] `hassfest` and the HACS validation run on every push (hassfest verified and green; the
-      HACS check is skipped while the repository is private and runs once it is public).
+- [x] `hassfest` and the HACS validation run on every push and are green.
 - [x] Adapter tests on the Home Assistant test harness (Python 3.14): config flow, setup,
       entities, diagnostics.
 - [x] Coverage reported; library gate at 85 %.
@@ -92,8 +91,9 @@ Run together before tagging `0.1.0`:
       Assistant un-mutes the TV while Home Assistant reports it as muted.
 - [x] **(field)** F8 Diagnostics download reviewed: address, MAC, client identity, TV id and entry
       id are redacted; the programme title no longer is (it was over-redacted).
-- [ ] **(field)** F9 Install from the published repository and update to the next
-      pre-release; confirm the update is offered.
+- [ ] **(field)** F9 Install from the published repository (done: installed from HACS as a
+      custom repository, `0.1.0rc1`) and update to the next pre-release; confirm the update is
+      offered (open).
 - [ ] **(field)** F10 One day with debug logging; look for connection flaps and for the slow
       config entry setup seen at startup (about 7 s in the diagnostics timings).
 - [x] **(field)** F11 The label reads `H65B7320` while the TV reports `65A6101EE_0001` in its
@@ -111,8 +111,8 @@ Run together before tagging `0.1.0`:
       watched (screen, MQTT port, pushes): neither has any effect on the reference TV. The
       TV does not report `fake_sleep`, so `KEY_POWER` is a full standby and the only
       reliable wake-up is the network packet or an HDMI-CEC device.
-- [ ] **(field)** F14 First CI run of hassfest, the HACS validation and the integration tests
-      on GitHub is green (hassfest and the tests are; the HACS check waits for a public repo).
+- [x] **(field)** F14 First CI run of hassfest, the HACS validation and the integration tests
+      on GitHub is green.
 - [x] **(field)** F15 The MAC address is learned automatically when left empty at setup.
 - [x] **(field)** F16 Turn off and on from Home Assistant: turn on is confirmed (wake-up
       packets, TV reachable 7 s later, "back online" logged); turn off, the no-op while off,
