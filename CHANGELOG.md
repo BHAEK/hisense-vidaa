@@ -6,6 +6,18 @@ All notable changes are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-09
+
+First stable release. Installation and update through the store were confirmed on a real
+Home Assistant; the release candidate below was verified on a real TV. A PIN starting with
+zero (with the string form) and a full day of debug logs are still to be confirmed, and are
+listed in `docs/compatibility.md`.
+
+### Changed
+
+- The release is no longer marked as a pre-release, so the store follows versions and its
+  "what changed" link points to a real tag.
+
 ## [0.1.0rc1] - 2026-11-09
 
 Release candidate: every feature was exercised on a real TV (see `docs/compatibility.md` for

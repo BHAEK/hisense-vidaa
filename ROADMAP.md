@@ -5,7 +5,8 @@ Status of the work towards the first public release (`0.1.0`) and beyond.
 
 ## Release policy
 
-Current step: `0.1.0rc1` is being published; `0.1.0` follows once F9, F10 and F12 are green.
+Current step: `0.1.0` is released (F9 is green; F10 and F12 stay open and are tracked in
+`docs/compatibility.md`). Fixes follow as `0.1.x`.
 
 - [Semantic Versioning](https://semver.org). One version number covers the library and the
   Home Assistant component, because the component ships a vendored copy of the library.
@@ -91,9 +92,8 @@ Run together before tagging `0.1.0`:
       Assistant un-mutes the TV while Home Assistant reports it as muted.
 - [x] **(field)** F8 Diagnostics download reviewed: address, MAC, client identity, TV id and entry
       id are redacted; the programme title no longer is (it was over-redacted).
-- [ ] **(field)** F9 Install from the published repository (done: installed from HACS as a
-      custom repository, `0.1.0rc1`) and update to the next pre-release; confirm the update is
-      offered (open).
+- [x] **(field)** F9 Install from the published repository (done: installed from HACS as a
+      custom repository) and update to the next release (done: the update was offered and applied).
 - [ ] **(field)** F10 One day with debug logging; look for connection flaps and for the slow
       config entry setup seen at startup (about 7 s in the diagnostics timings).
 - [x] **(field)** F11 The label reads `H65B7320` while the TV reports `65A6101EE_0001` in its

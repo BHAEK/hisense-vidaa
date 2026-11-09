@@ -19,7 +19,7 @@ No cloud, no polling, no account: the TV tells Home Assistant what it is doing t
 
 </div>
 
-> **Status: release candidate (`0.1.0rc1`).** Built and verified on a real 2018-generation TV.
+> **Status: first stable release (`0.1.0`).** Built and verified on a real 2018-generation TV.
 > Other models are expected to work but are not verified: see [what has been tested](docs/compatibility.md).
 > Independent community project, not affiliated with or endorsed by Hisense or VIDAA.
 
@@ -38,7 +38,7 @@ No cloud, no polling, no account: the TV tells Home Assistant what it is doing t
 ## 🚀 Install
 
 1. Click **Open in HACS** above (or add `https://github.com/BHAEK/hisense-vidaa` as a custom repository of type *Integration*), then install **Hisense VIDAA** and restart Home Assistant.
-   Until a stable release exists, versions are pre-releases, which the store shows only if you enable them.
+   The store follows the stable releases; a release candidate (`rc`) is offered only if you turn on the repository's *pre-release* switch.
 2. Click **Set up integration** above, or go to *Settings → Devices & services → Add integration → Hisense VIDAA*.
 3. **Turn the TV on**, enter its IP address and type the **PIN shown on the TV screen** (you have about a minute).
 
